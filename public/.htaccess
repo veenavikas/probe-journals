@@ -1,0 +1,37 @@
+Options -Indexes
+Options -ExecCGI
+
+DirectoryIndex index.php index.html
+
+RewriteEngine On
+
+# ── Force HTTPS on production ─────────────────────────────────
+# (Comment out if your host does not have SSL)
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP_HOST} !^localhost [NC]
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ── Pretty journal URLs ───────────────────────────────────────
+# /journals/journal-of-biology → journal.php?slug=journal-of-biology
+RewriteRule ^journals/([a-z0-9-]+)/?$ journal.php?slug=$1 [L,QSA]
+
+# ── Security: block sensitive file types ─────────────────────
+<FilesMatch "\.(env|sql|log|sh|bat|ini)$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# ── Security: block PHP execution in uploads ──────────────────
+<Directory "assets/uploads">
+  Options -ExecCGI
+  <FilesMatch "\.php$">
+    Order allow,deny
+    Deny from all
+  </FilesMatch>
+</Directory>
+
+# ── Security: prevent access to hidden files ──────────────────
+<FilesMatch "^\.">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
