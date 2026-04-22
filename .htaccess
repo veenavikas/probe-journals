@@ -1,3 +1,5 @@
+DirectoryIndex index.php router.php
+
 RewriteEngine On
 
 # Redirect everything to router.php unless it's a real file or directory
