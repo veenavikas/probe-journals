@@ -48,7 +48,7 @@ $page_title = "Manuscript Submission";
         top: -0.75rem; /* Position above the input line */
         transform: scale(0.85);
         font-weight: 500;
-        color: #4f46e5;
+        color: #2563eb;
         background-color: white;
     }
 
@@ -68,7 +68,7 @@ $page_title = "Manuscript Submission";
     }
     
     .submission-wrapper .floating-input:focus {
-       border-bottom: 2px solid #6366f1; /* indigo-600 */
+       border-bottom: 2px solid #2563eb; /* blue-600 */
     }
 
     /* Custom style for the file input wrapper */
@@ -133,7 +133,7 @@ $page_title = "Manuscript Submission";
 <div class="submission-wrapper">
     <div class="container mx-auto max-w-3xl p-4 sm:p-6 lg:p-8">
         <div class="text-center mb-10">
-            <h1 class="text-4xl font-extrabold text-indigo-700 m-0">Manuscript Submission</h1>
+            <h1 class="text-4xl font-extrabold text-blue-700 m-0">Manuscript Submission</h1>
             <p class="text-lg text-gray-500 mt-2">Submit your article and author details below.</p>
         </div>
 
@@ -257,7 +257,7 @@ $page_title = "Manuscript Submission";
             
             <!-- Submit Button -->
             <div class="flex justify-center pt-4">
-                <button type="submit" id="submitBtn" class="inline-flex items-center justify-center px-10 py-3 border border-transparent text-base font-medium rounded-xl shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-indigo-500 transition-all transform hover:scale-[1.02]">
+                <button type="submit" id="submitBtn" class="inline-flex items-center justify-center px-10 py-3 border border-transparent text-base font-medium rounded-xl shadow-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-blue-500 transition-all transform hover:scale-[1.02]">
                     <svg id="submitSpinner" class="hidden animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                     <span>Submit Manuscript</span>
                 </button>
@@ -272,7 +272,7 @@ $page_title = "Manuscript Submission";
         <div id="modalIcon"></div>
         <h3 id="modalTitle" class="text-2xl font-bold mt-4 mb-2"></h3>
         <p id="modalMessage" class="text-gray-600"></p>
-        <button id="closeModalBtn" class="mt-6 w-full px-6 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition">Close</button>
+        <button id="closeModalBtn" class="mt-6 w-full px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">Close</button>
     </div>
 </div>
 
@@ -406,7 +406,7 @@ $page_title = "Manuscript Submission";
             fileDisplay.classList.add('has-file');
             
             fileStatus.textContent = 'Reading file...';
-            fileStatus.classList.add('text-indigo-600');
+            fileStatus.classList.add('text-blue-600');
 
             try {
                 const base64Content = await fileToBase64(file);
@@ -417,13 +417,13 @@ $page_title = "Manuscript Submission";
                 };
                 
                 fileStatus.textContent = `File loaded successfully (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-                fileStatus.classList.remove('text-indigo-600');
+                fileStatus.classList.remove('text-blue-600');
                 fileStatus.classList.add('text-green-600');
 
             } catch (error) {
                 console.error('File reading failed:', error);
                 fileStatus.textContent = error.message;
-                fileStatus.classList.remove('text-indigo-600');
+                fileStatus.classList.remove('text-blue-600');
                 fileStatus.classList.add('text-red-600');
                 attachmentData = { base64: null, filename: null, valid: false };
             }

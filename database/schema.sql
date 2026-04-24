@@ -168,7 +168,7 @@ CREATE TABLE contact_messages (
 
 -- Seed default admin user (password: Admin@123 — MUST change after first login)
 INSERT INTO admin_users (username, password_hash, email, full_name) VALUES
-('admin', '$2y$12$LQv3c1yqBWVHxkd0LHAkCOYz6TiSUzGjBvL8TgVH3vXtF8YhpUe1e', 'admin@probejournals.com', 'Site Administrator');
+('admin', '$2y$12$6wqTw9SegoUAMiK25cVK1O4KwfhxJ6tNkt433sbywJi/8UqIm6GTy', 'admin@probejournals.com', 'Site Administrator');
 
 -- Seed default site settings
 INSERT INTO site_settings (setting_key, setting_value, setting_label, setting_type) VALUES

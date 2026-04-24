@@ -36,7 +36,7 @@
 
         /* Custom gradient for the navigation bar (kept bright for visual interest) */
         .nav-gradient {
-            background: linear-gradient(to right, #4F46E5, #9333EA); /* Indigo to Purple */
+            background: linear-gradient(to right, #1D4ED8, #3B82F6); /* Blue shades */
         }
         
         /* Custom scrollbar styling for potentially overflowing nav on very narrow screens */
@@ -151,7 +151,7 @@
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
-            background-image: linear-gradient(to right, #6366f1, #3b82f6); 
+            background-image: linear-gradient(to right, #3B82F6, #2563EB); 
         }
 
         /* Specific styling for Archive items to respect theme */
@@ -229,7 +229,7 @@
     <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
 
         <!-- Content 1: Home -->
-        <div id="content-home" class="tab-content neumorphic p-6 rounded-xl shadow-md border-t-4 border-indigo-600">
+        <div id="content-home" class="tab-content neumorphic p-6 rounded-xl shadow-md border-t-4 border-blue-600">
             <div class="container mx-auto px-4 py-8 md:py-16">
         <!-- Main grid layout for content and sidebar -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -434,7 +434,7 @@
         </div>
 
         <!-- Content 2: Editorial Board -->
-        <div id="content-editorial" class="tab-content hidden neumorphic p-6 rounded-xl shadow-md border-t-4 border-purple-600">
+        <div id="content-editorial" class="tab-content hidden neumorphic p-6 rounded-xl shadow-md border-t-4 border-blue-600">
            <div class="container mx-auto px-4 py-8 md:py-16">
         <!-- Editorial Board Section -->
         <div class="space-y-6">

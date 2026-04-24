@@ -86,7 +86,7 @@ $totalArticles = 102;
 .jb-submit-btn:hover { background: #2563eb; }
 
 .jb-tabs-bar {
-    background: linear-gradient(to right, #6366f1, #a855f7); /* Indigo to Purple */
+    background: linear-gradient(to right, #3b82f6, #1d4ed8); /* Blue to Dark Blue */
     position: sticky;
     top: 60px; /* offset for global header */
     z-index: 100;
@@ -417,7 +417,7 @@ $totalArticles = 102;
     </div>
 </div>
 
-<!-- Purple Nav Tabs -->
+<!-- Blue Nav Tabs -->
 <div class="jb-tabs-bar">
     <div class="jb-tabs-container" id="jb-tabs">
         <button class="jb-tab active" data-tab="home"><i class="fas fa-home"></i> Home</button>
