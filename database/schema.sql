@@ -1,8 +1,5 @@
 -- Run this in MySQL / phpMyAdmin
 
-CREATE DATABASE IF NOT EXISTS probe_journals CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE probe_journals;
-
 -- ADMIN USERS
 CREATE TABLE admin_users (
   id INT AUTO_INCREMENT PRIMARY KEY,
