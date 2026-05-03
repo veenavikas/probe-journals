@@ -29,7 +29,7 @@ $page_title = "List of Journals";
                             <?php echo $j['subject_category']; ?>
                         </span>
                         <h3 style="font-size: 1.1rem; line-height: 1.4; margin-bottom: 10px;">
-                            <a href="journals/<?php echo $j['slug']; ?>"><?php echo sanitize($j['name']); ?></a>
+                            <a href="<?php echo SITE_URL; ?>/journals/<?php echo $j['slug']; ?>"><?php echo sanitize($j['name']); ?></a>
                         </h3>
                         <div style="font-size: 0.8rem; color: var(--muted);">
                             Impact Factor: <strong><?php echo $j['impact_factor']; ?></strong>
@@ -42,8 +42,8 @@ $page_title = "List of Journals";
                 </p>
                 
                 <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 15px;">
-                    <a href="journals/<?php echo $j['slug']; ?>" style="color: var(--indigo); font-weight: 600; font-size: 0.9rem;">View Journal &rarr;</a>
-                    <a href="journals/<?php echo $j['slug']; ?>&tab=submission" class="btn btn-primary" style="padding: 5px 15px; font-size: 0.8rem;">Submit</a>
+                    <a href="<?php echo SITE_URL; ?>/journals/<?php echo $j['slug']; ?>" style="color: var(--indigo); font-weight: 600; font-size: 0.9rem;">View Journal &rarr;</a>
+                    <a href="<?php echo SITE_URL; ?>/journals/<?php echo $j['slug']; ?>" class="btn btn-primary" style="padding: 5px 15px; font-size: 0.8rem;">Submit</a>
                 </div>
             </div>
             <?php endforeach; ?>

@@ -30,7 +30,7 @@ if ($action === 'delete' && $article_id) {
 
 // Handle Add/Edit Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'add' || $action === 'edit')) {
-    if (!verifyCSRFToken($_POST['csrf_token'])) {
+    if (!verifyCSRFToken($_POST['csrf_token'] ?? '')) {
         $message = '<div class="badge badge-danger">Security token mismatch.</div>';
     } else {
         $data = [

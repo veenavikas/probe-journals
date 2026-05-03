@@ -22,7 +22,7 @@
                     <li><a href="<?php echo SITE_URL; ?>/about.php">About Us</a></li>
                     <li><a href="<?php echo SITE_URL; ?>/apc.php">APC & Policies</a></li>
                     <li><a href="<?php echo SITE_URL; ?>/contact.php">Contact Us</a></li>
-                    <li><a href="<?php echo ADMIN_URL; ?>">Admin Login</a></li>
+
                 </ul>
             </div>
             

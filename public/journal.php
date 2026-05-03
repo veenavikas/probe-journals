@@ -1,8 +1,12 @@
 <?php
-require_once __DIR__ . '/../includes/header.php';
-
 $slug = $_GET['slug'] ?? '';
+
+// Load journal early so page_title is set before header.php
+require_once __DIR__ . '/../includes/functions.php';
 $journal = getJournalBySlug($slug);
+$page_title = $journal ? $journal['name'] : 'Journal Not Found';
+
+require_once __DIR__ . '/../includes/header.php';
 
 if (!$journal) {
     echo "<div class='container' style='padding: 100px 0; text-align: center;'><h2>Journal not found.</h2><a href='" . SITE_URL . "' class='btn btn-primary'>Return Home</a></div>";
@@ -10,7 +14,7 @@ if (!$journal) {
     exit();
 }
 
-$page_title = $journal['name'];
+// $page_title already set above before header include
 
 // Dynamic data setup
 $editors = getEditorsByJournal($journal['id']);
@@ -586,12 +590,20 @@ $totalArticles = 102;
                                            <?php foreach($arts as $art): ?>
                                                <div class="archive-article">
                                                    <span class="archive-article-type"><?php echo htmlspecialchars($art['article_type'] ?? ''); ?></span>
-                                                   <a href="<?php echo UPLOAD_URL . $art['pdf_file']; ?>" target="_blank" style="text-decoration: none;">
-                                                       <h4 class="archive-article-title"><?php echo htmlspecialchars($art['title'] ?? ''); ?></h4>
-                                                   </a>
-                                                   <div class="archive-article-authors">AUTHORS: <?php echo htmlspecialchars($art['authors'] ?? ''); ?></div>
-                                                   <div class="archive-article-actions">
-                                                       <a href="<?php echo UPLOAD_URL . $art['pdf_file']; ?>" target="_blank" style="color: #2563eb; font-weight: 600; font-size: 0.85rem;"><i class="fas fa-file-pdf" style="color: #ef4444;"></i> PDF</a>
+                                                    <?php if (!empty($art['pdf_file'])): ?>
+                                                    <a href="<?php echo UPLOAD_URL . $art['pdf_file']; ?>" target="_blank" style="text-decoration: none;">
+                                                        <h4 class="archive-article-title"><?php echo htmlspecialchars($art['title'] ?? ''); ?></h4>
+                                                    </a>
+                                                    <?php else: ?>
+                                                    <h4 class="archive-article-title"><?php echo htmlspecialchars($art['title'] ?? ''); ?></h4>
+                                                    <?php endif; ?>
+                                                    <div class="archive-article-authors">AUTHORS: <?php echo htmlspecialchars($art['authors'] ?? ''); ?></div>
+                                                    <div class="archive-article-actions">
+                                                        <?php if (!empty($art['pdf_file'])): ?>
+                                                        <a href="<?php echo UPLOAD_URL . $art['pdf_file']; ?>" target="_blank" style="color: #2563eb; font-weight: 600; font-size: 0.85rem;"><i class="fas fa-file-pdf" style="color: #ef4444;"></i> PDF</a>
+                                                        <?php else: ?>
+                                                        <span style="color: #94a3b8; font-size: 0.85rem;"><i class="fas fa-file-pdf"></i> PDF Unavailable</span>
+                                                        <?php endif; ?>
                                                        <span style="font-size: 0.85rem; color: #64748b;"><i class="fas fa-eye"></i> <?php echo $art['views_count']; ?></span>
                                                        <span style="font-size: 0.85rem; color: #64748b;"><i class="fas fa-download"></i> <?php echo $art['downloads_count']; ?></span>
                                                    </div>
@@ -615,9 +627,40 @@ $totalArticles = 102;
                <div id="jb-pane-contact" class="jb-pane" style="display: none;">
                    <h2 class="jb-section-title" style="margin-top: 0;">Contact Us</h2>
                    <div class="jb-prose">
-                       <p>For inquiries regarding manuscript submissions, peer review process, or general questions, please contact the editorial office.</p>
-                       <p><strong>Email:</strong> <a href="mailto:publish@probejournals.com" style="color: #2563eb;">publish@probejournals.com</a></p>
-                       <p><strong>Address:</strong> Probe Publisher, 45 Highfield Road, London, UK</p>
+                       <?php if (!empty($journal['contact_info'])): ?>
+                           <p><?php echo nl2br(htmlspecialchars($journal['contact_info'])); ?></p>
+                       <?php else: ?>
+                           <p>For inquiries regarding manuscript submissions, peer review process, or general questions, please contact the editorial office.</p>
+                           <p><strong>Email:</strong> <a href="mailto:publish@probejournals.com" style="color: #2563eb;">publish@probejournals.com</a></p>
+                           <p><strong>Address:</strong> Probe Publisher, 45 Highfield Road, London, UK</p>
+                       <?php endif; ?>
+                   </div>
+                   
+                   <!-- Contact Form -->
+                   <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-top: 30px;">
+                       <h3 style="font-size: 1.2rem; font-weight: 700; color: #1e293b; margin-bottom: 20px;">Send a Message</h3>
+                       <form action="<?php echo SITE_URL; ?>/contact.php" method="POST">
+                           <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
+                           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 16px;">
+                               <div>
+                                   <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;">Name (First, Last)</label>
+                                   <input type="text" name="name" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; background: #f8fafc;">
+                               </div>
+                               <div>
+                                   <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;">Email</label>
+                                   <input type="email" name="email" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; background: #f8fafc;">
+                               </div>
+                           </div>
+                           <div style="margin-bottom: 16px;">
+                               <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;">Subject</label>
+                               <input type="text" name="subject" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; background: #f8fafc;">
+                           </div>
+                           <div style="margin-bottom: 20px;">
+                               <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;">Comment or Message for <?php echo htmlspecialchars($journal['name'] ?? ''); ?></label>
+                               <textarea name="message" rows="5" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; background: #f8fafc;"></textarea>
+                           </div>
+                           <button type="submit" style="background: #3b82f6; color: white; padding: 12px 24px; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; width: 100%; transition: background 0.2s;">Send Message</button>
+                       </form>
                    </div>
                </div>
 
@@ -640,7 +683,7 @@ $totalArticles = 102;
                                <?php foreach ($jList as $jItem): ?>
                                <li style="margin-bottom: 4px; font-size: 0.85rem; padding-left: 10px; position: relative;">
                                    <span style="position: absolute; left: 0; color: #2563eb; font-size: 0.6rem; top: 5px;"><i class="fas fa-chevron-right"></i></span>
-                                   <a href="<?php echo SITE_URL; ?>/journal.php?slug=<?php echo $jItem['slug']; ?>" style="color: #2563eb; text-decoration: none;"><?php echo htmlspecialchars($jItem['name'] ?? ''); ?></a>
+                                    <a href="<?php echo SITE_URL; ?>/journals/<?php echo htmlspecialchars($jItem['slug'] ?? ''); ?>" style="color: #2563eb; text-decoration: none;"><?php echo htmlspecialchars($jItem['name'] ?? ''); ?></a>
                                </li>
                                <?php endforeach; ?>
                            </ul>

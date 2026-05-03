@@ -180,7 +180,7 @@ INSERT INTO site_settings (setting_key, setting_value, setting_label, setting_ty
 ('address_registered', '91 Ivy Lane, Waltham Cross, United Kingdom, EN8', 'Registered Address', 'textarea'),
 ('address_main', 'Probe Publisher, 45 Highfield Road, London, UK', 'Main Address', 'textarea'),
 ('oa_articles_total', '102', 'Total OA Articles', 'number'),
-('oa_journals_total', '7', 'Total OA Journals', 'number');
+('oa_journals_total', '9', 'Total OA Journals', 'number');
 
 -- Seed all 9 journals
 INSERT INTO journals (name, slug, short_name, subject_category, cite_score, impact_factor, h_index, acceptance_time, processing_time, publishing_time, issue_frequency, apc_amount, withdrawal_fee, submission_email, is_active, sort_order) VALUES
@@ -189,7 +189,7 @@ INSERT INTO journals (name, slug, short_name, subject_category, cite_score, impa
 ('Global Journal of Clinical Medicine', 'global-journal-of-clinical-medicine', 'GJCM', 'Medical Sciences', 2.20, 3.9, 7, '7-25 days', '10-20 days', '15-25 days', 'Bimonthly', 1019.00, 219.00, 'publish@probejournals.com', 1, 3),
 ('Research Journal of Neurology', 'research-journal-of-neurology', 'RJN', 'Medical Sciences', 2.30, 4.0, 7, '7-25 days', '10-20 days', '15-25 days', 'Bimonthly', 1019.00, 219.00, 'publish@probejournals.com', 1, 4),
 ('Journal of Diseases', 'journal-of-diseases', 'JOD', 'Medical Sciences', 2.00, 3.5, 5, '7-25 days', '10-20 days', '15-25 days', 'Bimonthly', 1019.00, 219.00, 'publish@probejournals.com', 1, 5),
-('Journal of Infectious Diseases and Therapy', 'journal-of-infectious-diseases-and-therapy', 'JIDT', 'Medical Sciences', 2.15, 3.7, 6, '7-25 days', '10-20 days', '15-25 days', 'Bimonthly', 1019.00, 219.00, 'publish@probejournals.com', 1, 6),
+('Journal of Infectious Diseases and Therapy', 'journal-of-infectious-diseases-therapy', 'JIDT', 'Medical Sciences', 2.15, 3.7, 6, '7-25 days', '10-20 days', '15-25 days', 'Bimonthly', 1019.00, 219.00, 'publish@probejournals.com', 1, 6),
 ('International Journal of Engineering and Computer Science', 'international-journal-of-engineering-and-computer-science', 'IJECS', 'Engineering', 1.90, 3.2, 5, '7-25 days', '10-20 days', '15-25 days', 'Bimonthly', 1019.00, 219.00, 'publish@probejournals.com', 1, 7),
 ('Trends in Diabetes Obesity and Metabolism', 'trends-in-diabetes-obesity-and-metabolism', 'TDOM', 'Clinical Sciences', 2.25, 3.9, 6, '7-25 days', '10-20 days', '15-25 days', 'Bimonthly', 1019.00, 219.00, 'publish@probejournals.com', 1, 8),
 ('Research in Microbiology and Biotechnology', 'research-in-microbiology-and-biotechnology', 'RMB', 'General Sciences', 2.05, 3.4, 5, '7-25 days', '10-20 days', '15-25 days', 'Bimonthly', 1019.00, 219.00, 'publish@probejournals.com', 1, 9);

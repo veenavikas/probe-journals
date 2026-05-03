@@ -1,13 +1,14 @@
 <?php
-require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../includes/functions.php';
 
-// Only allow POST
+// Only allow POST — redirect GET requests gracefully
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo "Method Not Allowed";
-    require_once __DIR__ . '/../includes/footer.php';
+    header('Location: ' . SITE_URL . '/submissions.php');
     exit();
 }
+
+require_once __DIR__ . '/../includes/header.php';
 
 $error = '';
 $success = false;

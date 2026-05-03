@@ -83,7 +83,7 @@ $journals_nav = getAllJournals();
                             </div>
                             <div class="mega-menu__grid">
                                 <?php if (!empty($journals_nav)): foreach ($journals_nav as $j): ?>
-                                <a href="<?php echo SITE_URL; ?>/journal.php?slug=<?php echo htmlspecialchars($j['slug'] ?? ''); ?>" class="mega-menu__item">
+                                <a href="<?php echo SITE_URL; ?>/journals/<?php echo htmlspecialchars($j['slug'] ?? ''); ?>" class="mega-menu__item">
                                     <span class="mega-menu__item-icon"><i class="fas fa-book"></i></span>
                                     <span class="mega-menu__item-title"><?php echo htmlspecialchars($j['name'] ?? 'Untitled'); ?></span>
                                 </a>

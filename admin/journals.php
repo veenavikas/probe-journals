@@ -25,14 +25,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'edit') {
         $cite_score = (float)$_POST['cite_score'];
         $h_index = (int)$_POST['h_index'];
         $apc = (float)$_POST['apc_amount'];
+        $contact_info = $_POST['contact_info'] ?? null;
         
         $sql = "UPDATE journals SET 
                 name = ?, slug = ?, short_name = ?, subject_category = ?, 
                 description = ?, aim_and_scope = ?, impact_factor = ?, 
-                cite_score = ?, h_index = ?, apc_amount = ? 
+                cite_score = ?, h_index = ?, apc_amount = ?, contact_info = ? 
                 WHERE id = ?";
         $stmt = $db->prepare($sql);
-        if ($stmt->execute([$name, $slug, $short_name, $category, $description, $aim_and_scope, $impact_factor, $cite_score, $h_index, $apc, $id])) {
+        if ($stmt->execute([$name, $slug, $short_name, $category, $description, $aim_and_scope, $impact_factor, $cite_score, $h_index, $apc, $contact_info, $id])) {
             $message = '<div class="badge badge-success" style="padding: 10px; margin-bottom: 20px;">Journal updated successfully!</div>';
         } else {
             $message = '<div class="badge badge-danger">Failed to update journal.</div>';
@@ -91,6 +92,11 @@ if ($action === 'edit' && $journal_id):
             <div class="form-group">
                 <label>Aim & Scope / Guidelines</label>
                 <textarea name="aim_and_scope" rows="5"><?php echo sanitize($journal['aim_and_scope'] ?? ''); ?></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Contact Info (Specific to this journal)</label>
+                <textarea name="contact_info" rows="4" placeholder="Leave blank to use global site contact info..."><?php echo sanitize($journal['contact_info'] ?? ''); ?></textarea>
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
