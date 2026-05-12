@@ -19,6 +19,7 @@ $journals_nav = getAllJournals();
     
     <!-- CSS -->
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/main.css">
+    <link rel="icon" type="image/png" href="<?php echo SITE_URL; ?>/assets/img/probe_publisher_logo_v1.png">
     <?php if (isset($extra_css)): ?>
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/<?php echo $extra_css; ?>">
     <?php endif; ?>
@@ -49,7 +50,7 @@ $journals_nav = getAllJournals();
     
     <div class="container nav-container">
         <a href="<?php echo SITE_URL; ?>" class="logo">
-            <h1 style="font-family: var(--font-serif); color: var(--indigo);"><?php echo SITE_NAME; ?></h1>
+            <img src="<?php echo SITE_URL; ?>/assets/img/probe_publisher_logo_v1.png" alt="<?php echo SITE_NAME; ?>" style="height: 50px; width: auto;">
         </a>
         
         <nav id="main-nav">

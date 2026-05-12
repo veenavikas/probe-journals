@@ -25,7 +25,7 @@ define('SITE_NAME', 'Probe Journals');
 
 // ── File Uploads ─────────────────────────────────────────────
 define('UPLOAD_PATH', __DIR__ . '/../public/assets/uploads/');
-define('UPLOAD_URL',  SITE_URL . '/assets/uploads/');
+define('UPLOAD_URL',  '/assets/uploads/');
 
 define('MAX_PDF_SIZE', 10 * 1024 * 1024);    // 10 MB
 define('MAX_IMG_SIZE',  2 * 1024 * 1024);    //  2 MB

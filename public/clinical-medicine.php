@@ -414,7 +414,7 @@
             <div class="overflow-hidden relative w-full bg-gray-100/50 py-6 rounded-lg">
                 <!-- Continuous scrolling wrapper -->
                 <div class="flex animate-scroll space-x-8">
-                <img src="https://probejournals.com/wp-content/uploads/2025/06/slide1.jpg" alt="PubMed Central" class="w-16 h-16 object-contain rounded bg-white shadow-md" onerror='this.onerror=null; this.src=\"https://placehold.co/64x64/f0f4f8/1e293b?text=P1\""' />
+                <img src="/assets/uploads/journals/clinical-medicine.png" alt="Clinical Medicine" class="w-16 h-16 object-contain rounded bg-white shadow-md">
                 <img src="https://probejournals.com/wp-content/uploads/2025/06/slide5-1.jpg" alt="Crossref" class="w-16 h-16 object-contain rounded bg-white shadow-md" onerror='this.onerror=null; this.src=\"https://placehold.co/64x64/f0f4f8/1e293b?text=P2\""'/>
                 <img src="https://probejournals.com/wp-content/uploads/2025/06/slide3.jpg" alt="COPE" class="w-16 h-16 object-contain rounded bg-white shadow-md" onerror='this.onerror=null; this.src=\"https://placehold.co/64x64/f0f4f8/1e293b?text=P3\""'/>
                 <img src="https://probejournals.com/wp-content/uploads/2025/06/slide1.jpg" alt="PubMed" class="w-16 h-16 object-contain rounded bg-white shadow-md" onerror='this.onerror=null; this.src=\"https://placehold.co/64x64/f0f4f8/1e293b?text=P4\""'/>

@@ -178,7 +178,13 @@ function uploadFile(array $file, string $type): string|false {
     
     $allowedMimes = ($type === 'pdf') ? ALLOWED_PDF : ALLOWED_IMG;
     $maxSize = ($type === 'pdf') ? MAX_PDF_SIZE : MAX_IMG_SIZE;
-    $subDir = ($type === 'pdf') ? 'pdfs/' : ($type === 'editor' ? 'editors/' : 'indexing/');
+    $subDir = match($type) {
+        'pdf' => 'pdfs/',
+        'editor' => 'editors/',
+        'indexing' => 'indexing/',
+        'journal' => 'journals/',
+        default => 'others/'
+    };
     
     if (!in_array($mime, $allowedMimes)) return false;
     if ($file['size'] > $maxSize) return false;

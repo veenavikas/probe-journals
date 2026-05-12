@@ -27,13 +27,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'edit') {
         $apc = (float)$_POST['apc_amount'];
         $contact_info = $_POST['contact_info'] ?? null;
         
+        $cover_image = $_POST['current_cover_image'] ?? null;
+        if (isset($_FILES['cover_image']) && $_FILES['cover_image']['error'] === UPLOAD_ERR_OK) {
+            $new_file = uploadFile($_FILES['cover_image'], 'journal');
+            if ($new_file) {
+                if ($cover_image) deleteFile($cover_image, 'journal');
+                $cover_image = $new_file;
+            }
+        }
+        
         $sql = "UPDATE journals SET 
                 name = ?, slug = ?, short_name = ?, subject_category = ?, 
                 description = ?, aim_and_scope = ?, impact_factor = ?, 
-                cite_score = ?, h_index = ?, apc_amount = ?, contact_info = ? 
+                cite_score = ?, h_index = ?, apc_amount = ?, contact_info = ?,
+                cover_image = ?
                 WHERE id = ?";
         $stmt = $db->prepare($sql);
-        if ($stmt->execute([$name, $slug, $short_name, $category, $description, $aim_and_scope, $impact_factor, $cite_score, $h_index, $apc, $contact_info, $id])) {
+        if ($stmt->execute([$name, $slug, $short_name, $category, $description, $aim_and_scope, $impact_factor, $cite_score, $h_index, $apc, $contact_info, $cover_image, $id])) {
             $message = '<div class="badge badge-success" style="padding: 10px; margin-bottom: 20px;">Journal updated successfully!</div>';
         } else {
             $message = '<div class="badge badge-danger">Failed to update journal.</div>';
@@ -56,9 +66,21 @@ if ($action === 'edit' && $journal_id):
     <?php echo $message; ?>
 
     <div class="card-table" style="padding: 30px;">
-        <form action="journals.php?action=edit&id=<?php echo $journal['id']; ?>" method="POST">
+        <form action="journals.php?action=edit&id=<?php echo $journal['id']; ?>" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
             <input type="hidden" name="id" value="<?php echo $journal['id']; ?>">
+            <input type="hidden" name="current_cover_image" value="<?php echo $journal['cover_image']; ?>">
+
+            <div class="form-group" style="margin-bottom: 25px;">
+                <label>Journal Cover Image</label>
+                <?php if ($journal['cover_image']): ?>
+                    <div style="margin-bottom: 10px;">
+                        <img src="/assets/uploads/<?php echo $journal['cover_image']; ?>" style="width: 120px; height: 160px; object-fit: cover; border-radius: 8px; border: 1px solid #cbd5e1;">
+                    </div>
+                <?php endif; ?>
+                <input type="file" name="cover_image" accept="image/*">
+                <small style="display: block; color: #64748b; margin-top: 5px;">Recommended size: 300x400px (Portrait)</small>
+            </div>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group">

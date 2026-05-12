@@ -4,7 +4,7 @@
     <div class="container">
         <div class="footer-grid">
             <div class="footer-about">
-                <h2 style="color: white; margin-bottom: 20px;"><?php echo SITE_NAME; ?></h2>
+                <img src="<?php echo SITE_URL; ?>/assets/img/probe_publisher_logo_v1.png" alt="<?php echo SITE_NAME; ?>" style="height: 60px; width: auto; margin-bottom: 20px;">
                 <p style="color: #94a3b8; font-size: 0.9rem;">
                     <?php echo getSiteSetting('site_tagline'); ?>
                 </p>

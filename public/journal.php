@@ -41,7 +41,7 @@ $totalArticles = 102;
 /* Precise Custom Styles to match the provided mockup */
 .jb-hero {
     /* Using an abstract science/biology background */
-    background: linear-gradient(rgba(17, 24, 39, 0.4), rgba(17, 24, 39, 0.6)), url('https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+    background: linear-gradient(rgba(17, 24, 39, 0.4), rgba(17, 24, 39, 0.6)), url('<?php echo $journal['cover_image'] ? '/assets/uploads/' . $journal['cover_image'] : 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=1920&q=80'; ?>') center/cover no-repeat;
     height: 380px;
     display: flex;
     flex-direction: column;

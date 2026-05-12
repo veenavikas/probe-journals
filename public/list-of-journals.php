@@ -21,7 +21,7 @@ $page_title = "List of Journals";
             <div class="neumorphic" style="display: flex; flex-direction: column; height: 100%;">
                 <div style="display: flex; gap: 20px; align-items: start; margin-bottom: 20px;">
                     <div style="width: 100px; height: 130px; flex-shrink: 0;">
-                        <img src="<?php echo $j['cover_image'] ? UPLOAD_URL . $j['cover_image'] : SITE_URL . '/assets/img/default-journal.jpg'; ?>" 
+                        <img src="<?php echo $j['cover_image'] ? '/assets/uploads/' . $j['cover_image'] : '/assets/img/default-journal.jpg'; ?>" 
                              style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
                     </div>
                     <div>

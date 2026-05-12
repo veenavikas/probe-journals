@@ -144,9 +144,10 @@ $testimonials    = getTestimonialsByJournal();
                 <ul class="hp-journal-cat__list">
                     <?php foreach ($catJournals as $j): ?>
                     <li>
-                        <a href="<?php echo SITE_URL; ?>/journals/<?php echo $j['slug']; ?>">
-                            <i class="fas fa-chevron-right"></i>
-                            <?php echo htmlspecialchars($j['name']); ?>
+                        <a href="<?php echo SITE_URL; ?>/journals/<?php echo $j['slug']; ?>" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+                            <img src="<?php echo $j['cover_image'] ? '/assets/uploads/' . $j['cover_image'] : '/assets/img/default-journal.jpg'; ?>" 
+                                 style="width: 40px; height: 55px; object-fit: cover; border-radius: 4px; flex-shrink: 0;">
+                            <span><?php echo htmlspecialchars($j['name']); ?></span>
                         </a>
                     </li>
                     <?php endforeach; ?>
