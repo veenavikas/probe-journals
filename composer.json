@@ -1,0 +1,8 @@
+{
+    "name": "veenavikas/probe-journals",
+    "description": "Probe Journals Academic Publishing Platform",
+    "type": "project",
+    "require": {
+        "php": ">=8.2.0"
+    }
+}

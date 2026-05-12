@@ -50,7 +50,7 @@ $journals_nav = getAllJournals();
     
     <div class="container nav-container">
         <a href="<?php echo SITE_URL; ?>" class="logo">
-            <img src="<?php echo SITE_URL; ?>/assets/img/probe_publisher_logo_v1.png" alt="<?php echo SITE_NAME; ?>" style="height: 50px; width: auto;">
+            <img src="<?php echo SITE_URL; ?>/assets/img/probe_publisher_logo_v1.png" alt="<?php echo SITE_NAME; ?>" style="height: 80px; width: auto;">
         </a>
         
         <nav id="main-nav">
