@@ -24,6 +24,16 @@ $testimonials = getTestimonialsByJournal($journal['id']);
 $partners = getAllIndexingPartners();
 $journalsByCategory = getJournalsByCategory();
 
+// Fetch articles in press
+$db = getDB();
+try {
+    $stmtInPress = $db->prepare("SELECT * FROM articles WHERE journal_id = ? AND in_press = 1 ORDER BY sort_order ASC, id DESC");
+    $stmtInPress->execute([$journal['id']]);
+    $inPressArticles = $stmtInPress->fetchAll();
+} catch (PDOException $e) {
+    $inPressArticles = [];
+}
+
 // Retrieve specific metrics dynamically, map fallbacks if null
 $citeScore = htmlspecialchars($journal['cite_score'] ?? '2.45');
 $impactFactor = htmlspecialchars($journal['impact_factor'] ?? '4.3');
@@ -139,15 +149,39 @@ $totalArticles = 102;
         inset 1px 1px 2px rgba(255,255,255,0.8);
     border: 1px solid #e2e8f0;
 }
-
-.jb-grid {
+.jb-main-layout {
     display: grid;
-    grid-template-columns: 1fr 340px;
+    grid-template-columns: 2fr 1fr;
     gap: 40px;
 }
 @media (max-width: 900px) {
-    .jb-grid { grid-template-columns: 1fr; }
+    .jb-main-layout { grid-template-columns: 1fr; }
 }
+
+/* Restored Neumorphic Card Styles for Guidelines/Ethics */
+.neumorphic {
+    background-color: #f0f4f8;
+    box-shadow: 8px 8px 16px #d1d9e6, -8px -8px 16px #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+}
+.p-6 { padding: 1.5rem; }
+.rounded-xl { border-radius: 0.75rem; }
+.space-y-4 > * + * { margin-top: 1rem; }
+.space-y-6 > * + * { margin-top: 1.5rem; }
+.text-xl { font-size: 1.25rem; }
+.text-lg { font-size: 1.125rem; }
+.font-semibold { font-weight: 600; }
+.text-gray-900 { color: #0f172a; }
+.leading-relaxed { line-height: 1.625; }
+.list-disc { list-style-type: disc; }
+.list-inside { list-style-position: inside; }
+.ml-4 { margin-left: 1rem; }
+.mt-4 { margin-top: 1rem; }
+.mt-6 { margin-top: 1.5rem; }
+.mt-12 { margin-top: 3rem; }
+.w-full { width: 100%; }
+
 
 /* Left Column Specifics */
 .jb-metrics-stack {
@@ -156,21 +190,17 @@ $totalArticles = 102;
     gap: 12px;
     margin-bottom: 40px;
 }
-.jb-metric-pill {
-    background: #1d4ed8;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 4px;
+.jb-metric-item {
     font-size: 0.95rem;
     font-weight: 500;
-    width: fit-content;
-    box-shadow: 0 4px 6px rgba(29, 78, 216, 0.2);
+    color: #1e293b;
+    margin-bottom: 8px;
+    line-height: 1.5;
 }
-.jb-metric-pill--large {
-    font-size: 1.1rem;
-    font-weight: 700;
+.jb-metric-item strong {
+    color: #0f172a;
 }
-.jb-metric-pill a { color: white; text-decoration: underline; }
+.jb-metric-item a { color: #2563eb; text-decoration: underline; }
 
 .jb-section-title {
     font-family: 'Lora', serif;
@@ -439,21 +469,23 @@ $totalArticles = 102;
 <div class="jb-page-wrap">
     <div class="jb-main-card">
         
-       <div class="jb-grid">
+       <div class="jb-main-layout">
            <!-- Left Column (Content Panes) -->
            <div class="jb-main-col">
                
                <!-- HOME TAB -->
                <div id="jb-pane-home" class="jb-pane">
-                   <div class="jb-metrics-stack">
-                       <div class="jb-metric-pill jb-metric-pill--large"><?php echo htmlspecialchars($journal['name'] ?? ''); ?></div>
-                       <div class="jb-metric-pill">Journal Cite Score: <?php echo $citeScore; ?></div>
-                       <div class="jb-metric-pill">Journal Impact Factor: <?php echo $impactFactor; ?></div>
-                       <div class="jb-metric-pill">Overall acceptance and publication time: <?php echo $acceptanceTime; ?></div>
-                       <div class="jb-metric-pill">Average article processing time: <?php echo $processingTime; ?></div>
-                       <div class="jb-metric-pill">Journal H-Index: <?php echo $hIndex; ?></div>
-                       <div class="jb-metric-pill">Please submit article at <a href="mailto:<?php echo htmlspecialchars($journal['submission_email'] ?? ''); ?>"><?php echo htmlspecialchars($journal['submission_email'] ?? ''); ?></a></div>
-                   </div>
+                    <div class="jb-metrics-stack">
+                        <div class="jb-metric-item" style="font-size: 1.2rem; font-weight: 700; color: #1e3a5f; margin-bottom: 12px; border-left: 4px solid #1e3a5f; padding-left: 10px;">
+                            <?php echo htmlspecialchars($journal['name'] ?? ''); ?>
+                        </div>
+                        <div class="jb-metric-item"><strong>Journal Cite Score:</strong> <?php echo $citeScore; ?></div>
+                        <div class="jb-metric-item"><strong>Journal Impact Factor:</strong> <?php echo $impactFactor; ?></div>
+                        <div class="jb-metric-item"><strong>Overall acceptance and publication time:</strong> <?php echo $acceptanceTime; ?></div>
+                        <div class="jb-metric-item"><strong>Average article processing time:</strong> <?php echo $processingTime; ?></div>
+                        <div class="jb-metric-item"><strong>Journal H-Index:</strong> <?php echo $hIndex; ?></div>
+                        <div class="jb-metric-item"><strong>Please submit article at:</strong> <a href="mailto:<?php echo htmlspecialchars($journal['submission_email'] ?? ''); ?>"><?php echo htmlspecialchars($journal['submission_email'] ?? ''); ?></a></div>
+                    </div>
 
                    <h2 class="jb-section-title">Our Editors</h2>
                    <?php if (!empty($editors)): ?>
@@ -473,6 +505,7 @@ $totalArticles = 102;
                    <div class="jb-prose">
                        <?php echo nl2br(htmlspecialchars($journal['aim_and_scope'] ?? '')); ?>
                    </div>
+
 
                    <h2 class="jb-section-title" style="margin-top: 40px;">Privacy Statement</h2>
                    <div class="jb-prose">
@@ -503,19 +536,75 @@ $totalArticles = 102;
                <div id="jb-pane-guidelines" class="jb-pane" style="display: none;">
                    <h2 class="jb-section-title" style="margin-top: 0;">Author Guidelines</h2>
                    <div class="jb-prose">
-                       <p><strong>Covered Areas:</strong> <?php echo htmlspecialchars($journal['subject_category'] ?? ''); ?></p>
-                       <p><strong>Issue release frequency:</strong> <?php echo htmlspecialchars($journal['issue_frequency'] ?? ''); ?></p>
-                       <p>The Journal accepts papers of high quality in any area of its scope. After submitting articles, authors will get all regular updates of the articles. Updates will include preliminary quality analysis, reviewer comments, editor decision, publishing of the article etc.</p>
-                       <br>
-                       <h3>Article Processing Charges (APC)</h3>
-                       <p>Our journals are not receiving any kind of financial support. The journal not charging any kind of subscription/submission fee, but we charge the fee.</p>
-                       <p>For all kind of articles, the Article Processing Charges (APC) would be <strong><?php echo htmlspecialchars(($journal['apc_currency'] ?? '') . ' ' . ($journal['apc_amount'] ?? '')); ?></strong>.</p>
-                       <br>
-                       <h3>Author Withdrawal Policy</h3>
-                       <p>We are not charging any kind of withdrawal fee if the authors want to withdraw the article within <?php echo htmlspecialchars($journal['withdrawal_days'] ?? 5); ?> days. If the authors want to withdraw the article after <?php echo htmlspecialchars($journal['withdrawal_days'] ?? 5); ?> days, we will charge <?php echo htmlspecialchars(($journal['apc_currency'] ?? '') . ' ' . ($journal['withdrawal_fee'] ?? 200)); ?> as a withdrawal fee.</p>
-                       <br>
-                       <h3>Copyrights</h3>
-                       <p>The journal retains the copyright and any extensions or renewals thereof worldwide. This includes, but is not limited to, the rights to publish, disseminate, transmit, store, translate, distribute, sell, republish, and use the contribution and its contents in both print and electronic formats.</p>
+                       <?php if (!empty($journal['author_guidelines'])): ?>
+                           <?php 
+                           if (strip_tags($journal['author_guidelines']) === $journal['author_guidelines']) {
+                               echo nl2br(htmlspecialchars($journal['author_guidelines']));
+                           } else {
+                               echo $journal['author_guidelines'];
+                           }
+                           ?>
+                       <?php else: ?>
+                           <p><strong>Covered Areas:</strong> <?php echo htmlspecialchars($journal['subject_category'] ?? ''); ?></p>
+                           <p><strong>Issue release frequency:</strong> <?php echo htmlspecialchars($journal['issue_frequency'] ?? ''); ?></p>
+                           <p>The Journal accepts papers of high quality in any area of its scope. After submitting articles, authors will get all regular updates of the articles. Updates will include preliminary quality analysis, reviewer comments, editor decision, publishing of the article etc.</p>
+                           <br>
+                           <h3>Article Processing Charges (APC)</h3>
+                           <p>Our journals are not receiving any kind of financial support. The journal not charging any kind of subscription/submission fee, but we charge the fee.</p>
+                           <p>For all kind of articles, the Article Processing Charges (APC) would be <strong><?php echo htmlspecialchars(($journal['apc_currency'] ?? '') . ' ' . ($journal['apc_amount'] ?? '')); ?></strong>.</p>
+                           <br>
+                           <h3>Author Withdrawal Policy</h3>
+                           <p>We are not charging any kind of withdrawal fee if the authors want to withdraw the article within <?php echo htmlspecialchars($journal['withdrawal_days'] ?? 5); ?> days. If the authors want to withdraw the article after <?php echo htmlspecialchars($journal['withdrawal_days'] ?? 5); ?> days, we will charge <?php echo htmlspecialchars(($journal['apc_currency'] ?? '') . ' ' . ($journal['withdrawal_fee'] ?? 200)); ?> as a withdrawal fee.</p>
+                           <br>
+                           <h3>Copyrights</h3>
+                           <p>The journal retains the copyright and any extensions or renewals thereof worldwide. This includes, but is not limited to, the rights to publish, disseminate, transmit, store, translate, distribute, sell, republish, and use the contribution and its contents in both print and electronic formats.</p>
+
+                           <!-- Restored Old Page Cards -->
+                           <div class="w-full space-y-6 mt-12">
+                               <div class="neumorphic p-6 rounded-xl space-y-4">
+                                   <h3 class="text-xl font-semibold text-gray-900">Peer Review process</h3>
+                                   <p class="leading-relaxed">Every published article undergoes a double-blind peer review process. All papers must be checked for plagiarism only.</p>
+                                   <p class="leading-relaxed">The editor assigns the submitted manuscript to two external reviewers.</p>
+                               </div>
+
+                               <div class="neumorphic p-6 rounded-xl space-y-4">
+                                   <h3 class="text-xl font-semibold text-gray-900">Article Types accepted</h3>
+                                   <ul class="list-disc list-inside space-y-1 ml-4">
+                                       <li>Research articles</li>
+                                       <li>Review articles</li>
+                                       <li>Case reports</li>
+                                       <li>Short reports</li>
+                                       <li>Methodologies</li>
+                                   </ul>
+                               </div>
+
+                               <div class="neumorphic p-6 rounded-xl space-y-4">
+                                   <h3 class="text-xl font-semibold text-gray-900">Manuscript Formatting</h3>
+                                   <p class="leading-relaxed">Provide the original manuscript with all components included (Title, Abstract, Introduction, Materials and Methods, Results, Discussion, Conclusion, References, and figure legends)</p>
+                                   <ul class="list-disc list-inside space-y-1 ml-4">
+                                       <li>Times new roman, 12pt, double spacing, fully justified</li>
+                                       <li>Reference limit - up to 40</li>
+                                       <li>Provide figures with high resolution</li>
+                                       <li>Provide Tables appropriately</li>
+                                       <li>All authors must be responsible for the manuscript</li>
+                                   </ul>
+                               </div>
+
+                               <h2 class="text-xl font-semibold text-gray-900 mt-6" style="font-family:'Lora',serif;">Manuscript Categories & Guidelines</h2>
+
+                               <div class="neumorphic p-6 rounded-xl space-y-4 mt-4">
+                                   <h3 class="text-xl font-semibold text-gray-900">1. Research articles</h3>
+                                   <p class="leading-relaxed">Based on original empirical or secondary data using a defined research methodology.</p>
+                                   <p class="leading-relaxed">Must contribute new knowledge to the field of journal.</p>
+                               </div>
+
+                               <div class="neumorphic p-6 rounded-xl space-y-4 mt-4">
+                                   <h3 class="text-xl font-semibold text-gray-900">2. Review Articles</h3>
+                                   <p class="leading-relaxed">Based on secondary data relevant to the journal's scope.</p>
+                                   <p class="leading-relaxed">Provide a critical overview of a specific topic.</p>
+                               </div>
+                           </div>
+                       <?php endif; ?>
                    </div>
                </div>
 
@@ -523,12 +612,22 @@ $totalArticles = 102;
                <div id="jb-pane-ethics" class="jb-pane" style="display: none;">
                    <h2 class="jb-section-title" style="margin-top: 0;">Publication Ethics & Malpractice</h2>
                    <div class="jb-prose">
-                       <h3>Responsibilities of the editors</h3>
-                       <p>This Journal is always a collaborative effort. Managing challenges of research integrity and publishing ethics in the journal is no exception. Legal concerns may arise as a result of these issues.</p>
-                       <h3>Confidentiality</h3>
-                       <p>The corresponding author, reviewers, potential reviewers, other editorial advisers, and the publisher, as appropriate, are the only people who should know about a manuscript that has been submitted to them.</p>
-                       <h3>Responsibilities of reviewers</h3>
-                       <p>The peer-reviewing process helps the editor and editorial board make editorial judgments, and it may also help the author improve their manuscript. Manuscripts submitted for review must be treated as private papers.</p>
+                       <?php if (!empty($journal['publication_ethics'])): ?>
+                           <?php 
+                           if (strip_tags($journal['publication_ethics']) === $journal['publication_ethics']) {
+                               echo nl2br(htmlspecialchars($journal['publication_ethics']));
+                           } else {
+                               echo $journal['publication_ethics'];
+                           }
+                           ?>
+                       <?php else: ?>
+                           <h3>Responsibilities of the editors</h3>
+                           <p>This Journal is always a collaborative effort. Managing challenges of research integrity and publishing ethics in the journal is no exception. Legal concerns may arise as a result of these issues.</p>
+                           <h3>Confidentiality</h3>
+                           <p>The corresponding author, reviewers, potential reviewers, other editorial advisers, and the publisher, as appropriate, are the only people who should know about a manuscript that has been submitted to them.</p>
+                           <h3>Responsibilities of reviewers</h3>
+                           <p>The peer-reviewing process helps the editor and editorial board make editorial judgments, and it may also help the author improve their manuscript. Manuscripts submitted for review must be treated as private papers.</p>
+                       <?php endif; ?>
                    </div>
                </div>
                
@@ -536,8 +635,18 @@ $totalArticles = 102;
                <div id="jb-pane-submission" class="jb-pane" style="display: none;">
                    <h2 class="jb-section-title" style="margin-top: 0;">Submit Manuscript</h2>
                    <div class="jb-prose" style="margin-bottom: 24px;">
-                       <p>Submit manuscript via the form below or send as an e-mail attachment to the Editorial Office at <a href="mailto:<?php echo htmlspecialchars($journal['submission_email'] ?? ''); ?>" style="color: #2563eb;"><?php echo htmlspecialchars($journal['submission_email'] ?? ''); ?></a></p>
-                       <p>Accepted articles will be published approximately in <?php echo htmlspecialchars($journal['publishing_time'] ?? '15-25 days'); ?>.</p>
+                       <?php if (!empty($journal['submission_content'])): ?>
+                           <?php 
+                           if (strip_tags($journal['submission_content']) === $journal['submission_content']) {
+                               echo nl2br(htmlspecialchars($journal['submission_content']));
+                           } else {
+                               echo $journal['submission_content'];
+                           }
+                           ?>
+                       <?php else: ?>
+                           <p>Submit manuscript via the form below or send as an e-mail attachment to the Editorial Office at <a href="mailto:<?php echo htmlspecialchars($journal['submission_email'] ?? ''); ?>" style="color: #2563eb;"><?php echo htmlspecialchars($journal['submission_email'] ?? ''); ?></a></p>
+                           <p>Accepted articles will be published approximately in <?php echo htmlspecialchars($journal['publishing_time'] ?? '15-25 days'); ?>.</p>
+                       <?php endif; ?>
                    </div>
                    
                    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
@@ -617,11 +726,27 @@ $totalArticles = 102;
                    <?php endif; ?>
                </div>
 
-               <!-- ARTICLES IN PRESS TAB -->
-               <div id="jb-pane-articles" class="jb-pane" style="display: none;">
-                   <h2 class="jb-section-title" style="margin-top: 0;">Articles In Press</h2>
-                   <p>There are currently no articles in press for this journal.</p>
-               </div>
+                <!-- ARTICLES IN PRESS TAB -->
+                <div id="jb-pane-articles" class="jb-pane" style="display: none;">
+                    <h2 class="jb-section-title" style="margin-top: 0;">Articles In Press</h2>
+                    <?php if (empty($inPressArticles)): ?>
+                        <p>There are currently no articles in press for this journal.</p>
+                    <?php else: ?>
+                        <?php foreach ($inPressArticles as $art): ?>
+                            <div class="archive-article">
+                                <span class="archive-article-type"><?php echo htmlspecialchars($art['article_type'] ?? 'Research Article'); ?></span>
+                                <h3 class="archive-article-title"><?php echo htmlspecialchars($art['title']); ?></h3>
+                                <div class="archive-article-authors">By <?php echo htmlspecialchars($art['authors']); ?></div>
+                                <div class="archive-article-actions">
+                                    <?php if ($art['pdf_file']): ?>
+                                        <a href="<?php echo SITE_URL; ?>/assets/uploads/<?php echo htmlspecialchars($art['pdf_file']); ?>" class="btn btn-primary btn-sm" target="_blank"><i class="fas fa-file-pdf"></i> View PDF</a>
+                                    <?php endif; ?>
+                                    <span style="font-size: 0.8rem; color: #64748b; align-self: center;">Accepted: <?php echo formatDate($art['accepted_date']); ?></span>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
 
                <!-- CONTACT TAB -->
                <div id="jb-pane-contact" class="jb-pane" style="display: none;">

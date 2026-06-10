@@ -39,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'add' || $action === '
             'is_active'   => isset($_POST['is_active']) ? 1 : 0
         ];
 
+        $upload_failed = false;
         if (!empty($_FILES['logo']['name'])) {
             $uploaded = uploadFile($_FILES['logo'], 'indexing');
             if ($uploaded) {
@@ -46,25 +47,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'add' || $action === '
                     deleteFile($_POST['old_logo'], 'indexing');
                 }
                 $data['logo'] = $uploaded;
+            } else {
+                $message = '<div class="badge badge-danger">Failed to upload logo. Please verify folder permissions (755) and file size/type constraints (max 2MB, JPEG/PNG/WebP).</div>';
+                $upload_failed = true;
             }
         } elseif ($action === 'edit') {
             $data['logo'] = $_POST['old_logo'] ?? null;
         }
 
-        if ($action === 'add') {
-            $fields = implode(', ', array_keys($data));
-            $placeholders = implode(', ', array_fill(0, count($data), '?'));
-            $stmt = $db->prepare("INSERT INTO indexing_partners ($fields) VALUES ($placeholders)");
-            $stmt->execute(array_values($data));
-            header("Location: indexing.php?msg=added");
-            exit();
-        } else {
-            $id = (int)$_POST['id'];
-            $sets = [];
-            foreach ($data as $k => $v) $sets[] = "$k = ?";
-            $stmt = $db->prepare("UPDATE indexing_partners SET " . implode(', ', $sets) . " WHERE id = ?");
-            $stmt->execute(array_merge(array_values($data), [$id]));
-            $message = '<div class="badge badge-success" style="padding: 10px; margin-bottom: 20px;">Partner updated!</div>';
+        if (!$upload_failed) {
+            if ($action === 'add') {
+                $fields = implode(', ', array_keys($data));
+                $placeholders = implode(', ', array_fill(0, count($data), '?'));
+                $stmt = $db->prepare("INSERT INTO indexing_partners ($fields) VALUES ($placeholders)");
+                $stmt->execute(array_values($data));
+                header("Location: indexing.php?msg=added");
+                exit();
+            } else {
+                $id = (int)$_POST['id'];
+                $sets = [];
+                foreach ($data as $k => $v) $sets[] = "$k = ?";
+                $stmt = $db->prepare("UPDATE indexing_partners SET " . implode(', ', $sets) . " WHERE id = ?");
+                $stmt->execute(array_merge(array_values($data), [$id]));
+                $message = '<div class="badge badge-success" style="padding: 10px; margin-bottom: 20px;">Partner updated!</div>';
+            }
         }
     }
 }

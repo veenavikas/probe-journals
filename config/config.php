@@ -7,6 +7,13 @@
  *  PRODUCTION: Update DB_*, SITE_URL, ADMIN_URL, MAIL_* below
  * ============================================================
  */
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Load .env if it exists
+if (file_exists(__DIR__ . '/../.env')) {
+    $dotenv = Dotenv\Dotenv::createUnsafeImmutable(__DIR__ . '/../');
+    $dotenv->safeLoad();
+}
 
 // ── Database ────────────────────────────────────────────────
 define('DB_HOST',    getenv('DB_HOST')    ?: 'localhost');
@@ -14,6 +21,11 @@ define('DB_NAME',    getenv('DB_NAME')    ?: 'probe_journals');
 define('DB_USER',    getenv('DB_USER')    ?: 'root');          // Change for production
 define('DB_PASS',    getenv('DB_PASS')    ?: '');               // Change for production
 define('DB_CHARSET', 'utf8mb4');
+
+// Load local overrides if they exist (for production/hostinger)
+if (file_exists(__DIR__ . '/config.local.php')) {
+    include __DIR__ . '/config.local.php';
+}
 
 // ── URLs ─────────────────────────────────────────────────────
 // Local dev (php -S localhost:8080 router.php) → http://localhost:8080

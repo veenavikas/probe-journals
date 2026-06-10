@@ -15,7 +15,7 @@ function getDB(): PDO {
     } catch (PDOException $e) {
       error_log("Database connection failed: " . $e->getMessage());
       http_response_code(500);
-      die("A database error occurred. Please try again later.");
+      die("A database error occurred. Please try again later. (Check your credentials)");
     }
   }
   return $pdo;

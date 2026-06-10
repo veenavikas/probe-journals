@@ -1,7 +1,23 @@
 -- Run this in MySQL / phpMyAdmin
 
+-- Disable foreign key checks to allow dropping tables in any order
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- DROP TABLES IF THEY EXIST (In reverse dependency order to prevent #1451 errors)
+DROP TABLE IF EXISTS articles;
+DROP TABLE IF EXISTS submissions;
+DROP TABLE IF EXISTS testimonials;
+DROP TABLE IF EXISTS editors;
+DROP TABLE IF EXISTS journals;
+
+DROP TABLE IF EXISTS admin_users;
+DROP TABLE IF EXISTS indexing_partners;
+DROP TABLE IF EXISTS site_pages;
+DROP TABLE IF EXISTS site_settings;
+DROP TABLE IF EXISTS contact_messages;
+
 -- ADMIN USERS
-CREATE TABLE admin_users (
+CREATE TABLE IF NOT EXISTS admin_users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(100) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
@@ -11,24 +27,24 @@ CREATE TABLE admin_users (
 );
 
 -- JOURNALS
-CREATE TABLE journals (
+CREATE TABLE IF NOT EXISTS journals (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
-  slug VARCHAR(255) NOT NULL UNIQUE,          -- e.g. journal-of-biology
-  short_name VARCHAR(100),                    -- e.g. JOB
-  subject_category VARCHAR(100),              -- Clinical Sciences / Medical Sciences / General Sciences / Engineering
+  slug VARCHAR(255) NOT NULL UNIQUE,
+  short_name VARCHAR(100),
+  subject_category VARCHAR(100),
   description TEXT,
   aim_and_scope TEXT,
   cite_score DECIMAL(4,2),
   impact_factor DECIMAL(4,2),
   h_index INT,
-  acceptance_time VARCHAR(100),               -- e.g. 7-25 days
-  processing_time VARCHAR(100),               -- e.g. 10-20 days
-  publishing_time VARCHAR(100),               -- e.g. 15-25 days
-  issue_frequency VARCHAR(100),               -- e.g. Bimonthly
-  apc_amount DECIMAL(10,2),                   -- e.g. 1019.00
+  acceptance_time VARCHAR(100),
+  processing_time VARCHAR(100),
+  publishing_time VARCHAR(100),
+  issue_frequency VARCHAR(100),
+  apc_amount DECIMAL(10,2),
   apc_currency VARCHAR(10) DEFAULT 'EUR',
-  withdrawal_fee DECIMAL(10,2),               -- e.g. 219.00
+  withdrawal_fee DECIMAL(10,2),
   withdrawal_days INT DEFAULT 5,
   submission_email VARCHAR(255),
   privacy_statement TEXT,
@@ -42,11 +58,11 @@ CREATE TABLE journals (
 );
 
 -- EDITORIAL BOARD MEMBERS
-CREATE TABLE editors (
+CREATE TABLE IF NOT EXISTS editors (
   id INT AUTO_INCREMENT PRIMARY KEY,
   journal_id INT NOT NULL,
   full_name VARCHAR(255) NOT NULL,
-  role VARCHAR(100),                          -- Editor in Chief / Editor / Associate Editor
+  role VARCHAR(100),
   department VARCHAR(255),
   institution VARCHAR(255),
   country VARCHAR(100),
@@ -60,19 +76,19 @@ CREATE TABLE editors (
 );
 
 -- ARTICLES
-CREATE TABLE articles (
+CREATE TABLE IF NOT EXISTS articles (
   id INT AUTO_INCREMENT PRIMARY KEY,
   journal_id INT NOT NULL,
   volume INT NOT NULL,
   issue INT NOT NULL,
   title VARCHAR(500) NOT NULL,
   authors TEXT NOT NULL,
-  article_type VARCHAR(100),                  -- Research Article / Review Article / Case Report etc.
+  article_type VARCHAR(100),
   abstract TEXT,
   keywords VARCHAR(500),
-  pdf_file VARCHAR(255),                      -- path to uploaded PDF
+  pdf_file VARCHAR(255),
   doi VARCHAR(255),
-  pages VARCHAR(50),                          -- e.g. 1-12
+  pages VARCHAR(50),
   received_date DATE,
   accepted_date DATE,
   published_date DATE,
@@ -81,14 +97,15 @@ CREATE TABLE articles (
   is_retracted TINYINT DEFAULT 0,
   retraction_note TEXT,
   is_published TINYINT DEFAULT 1,
+  in_press TINYINT DEFAULT 0,
   sort_order INT DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (journal_id) REFERENCES journals(id) ON DELETE CASCADE
 );
 
--- ARTICLE SUBMISSIONS (from public submission form)
-CREATE TABLE submissions (
+-- ARTICLE SUBMISSIONS
+CREATE TABLE IF NOT EXISTS submissions (
   id INT AUTO_INCREMENT PRIMARY KEY,
   journal_id INT,
   author_name VARCHAR(255) NOT NULL,
@@ -111,9 +128,9 @@ CREATE TABLE submissions (
 );
 
 -- TESTIMONIALS
-CREATE TABLE testimonials (
+CREATE TABLE IF NOT EXISTS testimonials (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  journal_id INT,                             -- NULL = homepage testimonial
+  journal_id INT,
   reviewer_name VARCHAR(255) NOT NULL,
   reviewer_title VARCHAR(255),
   reviewer_institution VARCHAR(255),
@@ -125,8 +142,8 @@ CREATE TABLE testimonials (
   FOREIGN KEY (journal_id) REFERENCES journals(id) ON DELETE SET NULL
 );
 
--- INDEXING PARTNERS (scrolling logos)
-CREATE TABLE indexing_partners (
+-- INDEXING PARTNERS
+CREATE TABLE IF NOT EXISTS indexing_partners (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   logo VARCHAR(255),
@@ -135,10 +152,10 @@ CREATE TABLE indexing_partners (
   sort_order INT DEFAULT 0
 );
 
--- SITE PAGES (editable content blocks)
-CREATE TABLE site_pages (
+-- SITE PAGES
+CREATE TABLE IF NOT EXISTS site_pages (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  page_key VARCHAR(100) NOT NULL UNIQUE,     -- e.g. homepage_about, homepage_mission
+  page_key VARCHAR(100) NOT NULL UNIQUE,
   page_title VARCHAR(255),
   content LONGTEXT,
   meta_title VARCHAR(255),
@@ -146,8 +163,8 @@ CREATE TABLE site_pages (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- SITE SETTINGS (key-value store)
-CREATE TABLE site_settings (
+-- SITE SETTINGS
+CREATE TABLE IF NOT EXISTS site_settings (
   setting_key VARCHAR(100) PRIMARY KEY,
   setting_value TEXT,
   setting_label VARCHAR(255),
@@ -155,7 +172,7 @@ CREATE TABLE site_settings (
 );
 
 -- CONTACT MESSAGES
-CREATE TABLE contact_messages (
+CREATE TABLE IF NOT EXISTS contact_messages (
   id INT AUTO_INCREMENT PRIMARY KEY,
   first_name VARCHAR(100),
   last_name VARCHAR(100),
@@ -166,12 +183,12 @@ CREATE TABLE contact_messages (
   submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Seed default admin user (password: Admin@123 — MUST change after first login)
-INSERT INTO admin_users (username, password_hash, email, full_name) VALUES
+-- Seed default admin user
+INSERT IGNORE INTO admin_users (username, password_hash, email, full_name) VALUES
 ('admin', '$2y$12$6wqTw9SegoUAMiK25cVK1O4KwfhxJ6tNkt433sbywJi/8UqIm6GTy', 'admin@probejournals.com', 'Site Administrator');
 
 -- Seed default site settings
-INSERT INTO site_settings (setting_key, setting_value, setting_label, setting_type) VALUES
+INSERT IGNORE INTO site_settings (setting_key, setting_value, setting_label, setting_type) VALUES
 ('site_name', 'Probe Journals', 'Site Name', 'text'),
 ('site_tagline', 'Global Open Access Scientific and Academic Journals', 'Tagline', 'text'),
 ('contact_email', 'contact@probejournals.com', 'Contact Email', 'email'),
@@ -183,7 +200,7 @@ INSERT INTO site_settings (setting_key, setting_value, setting_label, setting_ty
 ('oa_journals_total', '9', 'Total OA Journals', 'number');
 
 -- Seed all 9 journals
-INSERT INTO journals (name, slug, short_name, subject_category, cite_score, impact_factor, h_index, acceptance_time, processing_time, publishing_time, issue_frequency, apc_amount, withdrawal_fee, submission_email, is_active, sort_order) VALUES
+INSERT IGNORE INTO journals (name, slug, short_name, subject_category, cite_score, impact_factor, h_index, acceptance_time, processing_time, publishing_time, issue_frequency, apc_amount, withdrawal_fee, submission_email, is_active, sort_order) VALUES
 ('Journal of Biology', 'journal-of-biology', 'JOB', 'General Sciences', 2.45, 4.3, 8, '7-25 days', '10-20 days', '15-25 days', 'Bimonthly', 1019.00, 219.00, 'publish@probejournals.com', 1, 1),
 ('Journal of Clinical Trials and Case Studies', 'journal-of-clinical-trials-and-case-studies', 'JCTCS', 'Clinical Sciences', 2.10, 3.8, 6, '7-25 days', '10-20 days', '15-25 days', 'Bimonthly', 1019.00, 219.00, 'publish@probejournals.com', 1, 2),
 ('Global Journal of Clinical Medicine', 'global-journal-of-clinical-medicine', 'GJCM', 'Medical Sciences', 2.20, 3.9, 7, '7-25 days', '10-20 days', '15-25 days', 'Bimonthly', 1019.00, 219.00, 'publish@probejournals.com', 1, 3),
@@ -194,8 +211,27 @@ INSERT INTO journals (name, slug, short_name, subject_category, cite_score, impa
 ('Trends in Diabetes Obesity and Metabolism', 'trends-in-diabetes-obesity-and-metabolism', 'TDOM', 'Clinical Sciences', 2.25, 3.9, 6, '7-25 days', '10-20 days', '15-25 days', 'Bimonthly', 1019.00, 219.00, 'publish@probejournals.com', 1, 8),
 ('Research in Microbiology and Biotechnology', 'research-in-microbiology-and-biotechnology', 'RMB', 'General Sciences', 2.05, 3.4, 5, '7-25 days', '10-20 days', '15-25 days', 'Bimonthly', 1019.00, 219.00, 'publish@probejournals.com', 1, 9);
 
--- Add DB indexes
-CREATE INDEX idx_articles_journal ON articles(journal_id);
-CREATE INDEX idx_articles_volume ON articles(journal_id, volume, issue);
-CREATE INDEX idx_editors_journal ON editors(journal_id);
-CREATE INDEX idx_submissions_status ON submissions(status);
+-- Add DB indexes (using procedure to avoid errors if they exist)
+DROP PROCEDURE IF EXISTS AddIndexes;
+DELIMITER //
+CREATE PROCEDURE AddIndexes()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.statistics WHERE table_name = 'articles' AND index_name = 'idx_articles_journal') THEN
+        CREATE INDEX idx_articles_journal ON articles(journal_id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.statistics WHERE table_name = 'articles' AND index_name = 'idx_articles_volume') THEN
+        CREATE INDEX idx_articles_volume ON articles(journal_id, volume, issue);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.statistics WHERE table_name = 'editors' AND index_name = 'idx_editors_journal') THEN
+        CREATE INDEX idx_editors_journal ON editors(journal_id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.statistics WHERE table_name = 'submissions' AND index_name = 'idx_submissions_status') THEN
+        CREATE INDEX idx_submissions_status ON submissions(status);
+    END IF;
+END //
+DELIMITER ;
+CALL AddIndexes();
+DROP PROCEDURE AddIndexes;
+
+-- Re-enable foreign key checks
+SET FOREIGN_KEY_CHECKS = 1;

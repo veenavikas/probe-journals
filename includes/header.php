@@ -19,7 +19,7 @@ $journals_nav = getAllJournals();
     
     <!-- CSS -->
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/main.css">
-    <link rel="icon" type="image/png" href="<?php echo SITE_URL; ?>/assets/img/probe_publisher_logo_v1.png">
+    <link rel="icon" type="image/png" href="<?php echo SITE_URL; ?>/assets/img/probe_publisher_header_v1-removebg-preview.png">
     <?php if (isset($extra_css)): ?>
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/<?php echo $extra_css; ?>">
     <?php endif; ?>
@@ -50,7 +50,7 @@ $journals_nav = getAllJournals();
     
     <div class="container nav-container">
         <a href="<?php echo SITE_URL; ?>" class="logo">
-            <img src="<?php echo SITE_URL; ?>/assets/img/probe_publisher_logo_v1.png" alt="<?php echo SITE_NAME; ?>" style="height: 120px; width: auto;">
+            <img src="<?php echo SITE_URL; ?>/assets/img/probe_publisher_header_v1-removebg-preview.png" alt="<?php echo SITE_NAME; ?>" style="height: 120px; width: auto;">
         </a>
         
         <nav id="main-nav">
@@ -65,10 +65,7 @@ $journals_nav = getAllJournals();
                     </ul>
                 </li>
 
-                <!-- 2. List of Journals -->
-                <li><a href="<?php echo SITE_URL; ?>/list-of-journals.php">List of Journals</a></li>
-
-                <!-- 3. APC -->
+                <!-- 2. APC -->
                 <li><a href="<?php echo SITE_URL; ?>/apc.php">APC</a></li>
 
                 <!-- 4. Journals — Mega Menu -->

@@ -14,14 +14,6 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-SET @MYSQLDUMP_TEMP_LOG_BIN = @@SESSION.SQL_LOG_BIN;
-SET @@SESSION.SQL_LOG_BIN= 0;
-
---
--- GTID state at the beginning of the backup 
---
-
-SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ '1059e63e-e17f-11f0-98bb-b032ea014558:1-248';
 
 --
 -- Table structure for table `admin_users`
@@ -80,6 +72,7 @@ CREATE TABLE `articles` (
   `is_retracted` tinyint DEFAULT '0',
   `retraction_note` text COLLATE utf8mb4_unicode_ci,
   `is_published` tinyint DEFAULT '1',
+  `in_press` tinyint DEFAULT '0',
   `sort_order` int DEFAULT '0',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -375,7 +368,7 @@ LOCK TABLES `testimonials` WRITE;
 INSERT INTO `testimonials` VALUES (1,NULL,'Sinisa Franjic',NULL,'Independent Researcher','Publishing with the Journal of Infectious Diseases & Therapy was a smooth and rewarding experience.',5,1,0,'2026-05-03 08:16:03'),(2,NULL,'Schmidt MG',NULL,'Medical University of South Carolina','I found the submission process to be very straightforward.',5,1,0,'2026-05-03 08:16:03');
 /*!40000 ALTER TABLE `testimonials` ENABLE KEYS */;
 UNLOCK TABLES;
-SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

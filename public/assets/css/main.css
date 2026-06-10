@@ -103,8 +103,15 @@ nav ul { display: flex; gap: 24px; }
 nav a { font-weight: 500; font-size: 0.95rem; color: var(--text); }
 nav a:hover { color: var(--indigo); }
 
+/* Bridge gap for top-level links only */
+nav > ul > li > a { 
+  padding: 35px 0; 
+  margin: -35px 0; 
+  display: inline-block;
+}
+
 /* ── Dropdown Menus ────────────────────────────────── */
-nav .dropdown { position: relative; }
+nav .dropdown { position: relative; padding-bottom: 30px; margin-bottom: -30px; }
 
 nav .dropdown-chevron {
   font-size: 0.65rem;
@@ -187,7 +194,7 @@ nav .dropdown-menu a i {
 [data-theme="dark"] nav .dropdown-menu a:hover { background: #0f172a; }
 
 /* ── Mega Menu ────────────────────────────────────── */
-nav .mega-dropdown { position: static; }
+nav .mega-dropdown { position: static; padding-bottom: 30px; margin-bottom: -30px; }
 nav .mega-menu {
   position: absolute;
   top: calc(100% + 10px);
@@ -209,10 +216,10 @@ nav .mega-menu {
 nav .mega-menu::before {
   content: '';
   position: absolute;
-  top: -30px;
+  top: -60px;
   left: 0;
   width: 100%;
-  height: 30px;
+  height: 60px;
   background: transparent;
 }
 
@@ -220,10 +227,10 @@ nav .mega-menu::before {
 nav .dropdown-menu::after {
   content: '';
   position: absolute;
-  top: -20px;
+  top: -40px;
   left: 0;
   width: 100%;
-  height: 20px;
+  height: 40px;
 }
 
 nav .mega-dropdown:hover .mega-menu {
@@ -989,4 +996,31 @@ footer h3 { font-size: 0.95rem; color: white; margin-bottom: 16px; font-family: 
   outline: none;
   border-color: var(--indigo);
   box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+
+/* Custom premium journal cards on homepage */
+.hp-journal-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    height: 100%;
+}
+.hp-journal-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    border-color: var(--indigo, #2563eb);
+}
+.hp-journal-card img {
+    transition: transform 0.2s ease-in-out;
+}
+.hp-journal-card:hover img {
+    transform: scale(1.05);
 }

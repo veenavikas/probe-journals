@@ -137,32 +137,23 @@ $testimonials    = getTestimonialsByJournal();
     <div class="container">
         <h2 class="hp-section-title text-center" style="margin-bottom:40px;">Journals By Subject</h2>
 
-        <div class="hp-journals-grid">
+        <div class="hp-journals-categories-grid" style="display: flex; flex-direction: column; gap: 40px;">
             <?php foreach ($groupedJournals as $category => $catJournals): ?>
-            <div class="hp-journal-cat">
-                <h3 class="hp-journal-cat__name"><?php echo htmlspecialchars($category); ?></h3>
-                <ul class="hp-journal-cat__list">
+            <div class="hp-journal-cat-block">
+                <h3 class="hp-journal-cat__name" style="font-family: 'Lora', serif; font-size: 1.4rem; font-weight: 700; color: #1e3a5f; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;"><?php echo htmlspecialchars($category); ?></h3>
+                <div class="hp-journals-cards-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 24px;">
                     <?php foreach ($catJournals as $j): ?>
-                    <li>
-                        <a href="<?php echo SITE_URL; ?>/journals/<?php echo $j['slug']; ?>" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+                    <a href="<?php echo SITE_URL; ?>/journals/<?php echo $j['slug']; ?>" class="hp-journal-card">
+                        <div style="width: 120px; height: 160px; overflow: hidden; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 12px;">
                             <img src="<?php echo $j['cover_image'] ? '/assets/uploads/' . $j['cover_image'] : '/assets/img/default-journal.jpg'; ?>" 
-                                 style="width: 40px; height: 55px; object-fit: cover; border-radius: 4px; flex-shrink: 0;">
-                            <span><?php echo htmlspecialchars($j['name']); ?></span>
-                        </a>
-                    </li>
+                                 style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <span style="font-size: 0.9rem; font-weight: 600; color: #1e293b; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;"><?php echo htmlspecialchars($j['name']); ?></span>
+                    </a>
                     <?php endforeach; ?>
-                </ul>
-            </div>
-            <?php endforeach; ?>
-
-            <!-- Decorative journal stack image -->
-            <div class="hp-journals-img-col">
-                <div class="hp-journal-stack">
-                    <div class="hp-journal-stack__book hp-journal-stack__book--1">Medical<br>Sciences</div>
-                    <div class="hp-journal-stack__book hp-journal-stack__book--2">Clinical<br>Research</div>
-                    <div class="hp-journal-stack__book hp-journal-stack__book--3">Engineering<br>Journal</div>
                 </div>
             </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>

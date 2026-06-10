@@ -93,6 +93,15 @@ require_once __DIR__ . '/../includes/header.php';
                         </div>
                     </div>
 
+                    <h3 class="ag-sub-heading" style="margin-top: 30px;"><i class="fas fa-info-circle"></i> General Instructions</h3>
+                    <p style="margin-bottom: 15px;">Authors are requested to follow these general instructions for manuscript preparation prior to submission:</p>
+                    <ul class="ag-checklist" style="margin-bottom: 30px;">
+                        <li><i class="fas fa-circle-check"></i> <strong>Spelling & Grammar:</strong> Ensure your manuscript is written in clear, correct English (either British or American standards are acceptable, but they must not be mixed).</li>
+                        <li><i class="fas fa-circle-check"></i> <strong>Style Consistency:</strong> Maintain a consistent layout and style throughout the document. Define abbreviations at their first mention.</li>
+                        <li><i class="fas fa-circle-check"></i> <strong>Units & Measures:</strong> Use standard SI units for all quantities. Use standard font symbols for math variables and equations.</li>
+                        <li><i class="fas fa-circle-check"></i> <strong>Paragraph and Spacing:</strong> Standard double-spacing and clear paragraph indentations should be used to improve readability.</li>
+                    </ul>
+
                     <h3 class="ag-sub-heading">Recommended Structure</h3>
                     <ol class="ag-ordered">
                         <li><strong>Title Page</strong> — Title, author names, affiliations, ORCID IDs, and corresponding author email.</li>

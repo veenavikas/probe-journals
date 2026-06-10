@@ -59,29 +59,42 @@ function getEditorsByJournal(int $journalId): array {
  */
 function getArticlesByJournal(int $journalId, ?int $volume = null, ?int $issue = null): array {
     $db = getDB();
-    $sql = "SELECT * FROM articles WHERE journal_id = ? AND is_published = 1";
-    $params = [$journalId];
     
-    if ($volume !== null) {
-        $sql .= " AND volume = ?";
-        $params[] = $volume;
+    // Attempt with in_press first
+    try {
+        $sql = "SELECT * FROM articles WHERE journal_id = ? AND is_published = 1 AND (in_press = 0 OR in_press IS NULL)";
+        $params = [$journalId];
+        if ($volume !== null) { $sql .= " AND volume = ?"; $params[] = $volume; }
+        if ($issue !== null) { $sql .= " AND issue = ?"; $params[] = $issue; }
+        $sql .= " ORDER BY volume DESC, issue DESC, sort_order ASC";
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        // Fallback for live site without in_press column
+        $sql = "SELECT * FROM articles WHERE journal_id = ? AND is_published = 1";
+        $params = [$journalId];
+        if ($volume !== null) { $sql .= " AND volume = ?"; $params[] = $volume; }
+        if ($issue !== null) { $sql .= " AND issue = ?"; $params[] = $issue; }
+        $sql .= " ORDER BY volume DESC, issue DESC, sort_order ASC";
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
     }
-    if ($issue !== null) {
-        $sql .= " AND issue = ?";
-        $params[] = $issue;
-    }
-    
-    $sql .= " ORDER BY volume DESC, issue DESC, sort_order ASC";
-    $stmt = $db->prepare($sql);
-    $stmt->execute($params);
-    return $stmt->fetchAll();
 }
 
 function getArticlesGroupedByVolume(int $journalId): array {
     $db = getDB();
-    $stmt = $db->prepare("SELECT * FROM articles WHERE journal_id = ? AND is_published = 1 ORDER BY volume DESC, issue DESC, sort_order ASC");
-    $stmt->execute([$journalId]);
-    $articles = $stmt->fetchAll();
+    
+    try {
+        $stmt = $db->prepare("SELECT * FROM articles WHERE journal_id = ? AND is_published = 1 AND (in_press = 0 OR in_press IS NULL) ORDER BY volume DESC, issue DESC, sort_order ASC");
+        $stmt->execute([$journalId]);
+        $articles = $stmt->fetchAll();
+    } catch (PDOException $e) {
+        $stmt = $db->prepare("SELECT * FROM articles WHERE journal_id = ? AND is_published = 1 ORDER BY volume DESC, issue DESC, sort_order ASC");
+        $stmt->execute([$journalId]);
+        $articles = $stmt->fetchAll();
+    }
     
     $grouped = [];
     foreach ($articles as $article) {
@@ -92,9 +105,19 @@ function getArticlesGroupedByVolume(int $journalId): array {
 
 function getLatestArticles(int $journalId, int $limit = 3): array {
     $db = getDB();
-    $stmt = $db->prepare("SELECT * FROM articles WHERE journal_id = ? AND is_published = 1 ORDER BY published_date DESC, id DESC LIMIT ?");
-    $stmt->execute([$journalId, $limit]);
-    return $stmt->fetchAll();
+    try {
+        $stmt = $db->prepare("SELECT * FROM articles WHERE journal_id = ? AND is_published = 1 AND (in_press = 0 OR in_press IS NULL) ORDER BY published_date DESC, id DESC LIMIT ?");
+        $stmt->bindValue(1, $journalId, PDO::PARAM_INT);
+        $stmt->bindValue(2, $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        $stmt = $db->prepare("SELECT * FROM articles WHERE journal_id = ? AND is_published = 1 ORDER BY published_date DESC, id DESC LIMIT ?");
+        $stmt->bindValue(1, $journalId, PDO::PARAM_INT);
+        $stmt->bindValue(2, $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 }
 
 /**
@@ -102,20 +125,28 @@ function getLatestArticles(int $journalId, int $limit = 3): array {
  */
 function getTestimonialsByJournal(?int $journalId = null): array {
     $db = getDB();
-    if ($journalId === null) {
-        $stmt = $db->prepare("SELECT * FROM testimonials WHERE journal_id IS NULL AND is_active = 1 ORDER BY sort_order ASC");
-        $stmt->execute();
-    } else {
-        $stmt = $db->prepare("SELECT * FROM testimonials WHERE journal_id = ? AND is_active = 1 ORDER BY sort_order ASC");
-        $stmt->execute([$journalId]);
+    try {
+        if ($journalId === null) {
+            $stmt = $db->prepare("SELECT * FROM testimonials WHERE journal_id IS NULL AND is_active = 1 ORDER BY sort_order ASC");
+            $stmt->execute();
+        } else {
+            $stmt = $db->prepare("SELECT * FROM testimonials WHERE journal_id = ? AND is_active = 1 ORDER BY sort_order ASC");
+            $stmt->execute([$journalId]);
+        }
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        return [];
     }
-    return $stmt->fetchAll();
 }
 
 function getAllIndexingPartners(): array {
     $db = getDB();
-    $stmt = $db->query("SELECT * FROM indexing_partners WHERE is_active = 1 ORDER BY sort_order ASC");
-    return $stmt->fetchAll();
+    try {
+        $stmt = $db->query("SELECT * FROM indexing_partners WHERE is_active = 1 ORDER BY sort_order ASC");
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        return [];
+    }
 }
 
 /**
@@ -152,8 +183,8 @@ function getPageContent(string $pageKey): string {
 /**
  * Security & Utilities
  */
-function sanitize(string $input): string {
-    return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
+function sanitize(?string $input): string {
+    return htmlspecialchars(trim($input ?? ''), ENT_QUOTES, 'UTF-8');
 }
 
 function generateCSRFToken(): string {
@@ -171,12 +202,29 @@ function verifyCSRFToken(string $token): bool {
 }
 
 function uploadFile(array $file, string $type): string|false {
-    if ($file['error'] !== UPLOAD_ERR_OK) return false;
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        error_log("Upload error code: " . $file['error']);
+        return false;
+    }
     
-    $finfo = new finfo(FILEINFO_MIME_TYPE);
-    $mime = $finfo->file($file['tmp_name']);
+    if (!class_exists('finfo')) {
+        error_log("finfo class does not exist. Please enable the fileinfo PHP extension.");
+        // Fallback mime detection based on extension if finfo is missing
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $mime = match($ext) {
+            'pdf' => 'application/pdf',
+            'jpg', 'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'webp' => 'image/webp',
+            default => 'application/octet-stream'
+        };
+    } else {
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->file($file['tmp_name']);
+    }
     
-    $allowedMimes = ($type === 'pdf') ? ALLOWED_PDF : ALLOWED_IMG;
+    // Support image/jpg as a valid alias for image/jpeg
+    $allowedMimes = ($type === 'pdf') ? ALLOWED_PDF : array_merge(ALLOWED_IMG, ['image/jpg']);
     $maxSize = ($type === 'pdf') ? MAX_PDF_SIZE : MAX_IMG_SIZE;
     $subDir = match($type) {
         'pdf' => 'pdfs/',
@@ -186,21 +234,40 @@ function uploadFile(array $file, string $type): string|false {
         default => 'others/'
     };
     
-    if (!in_array($mime, $allowedMimes)) return false;
-    if ($file['size'] > $maxSize) return false;
+    if (!in_array($mime, $allowedMimes)) {
+        error_log("Upload rejected: Invalid MIME type '{$mime}' for file '{$file['name']}'.");
+        return false;
+    }
+    if ($file['size'] > $maxSize) {
+        error_log("Upload rejected: File size {$file['size']} exceeds limit of {$maxSize} bytes.");
+        return false;
+    }
     
     $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
     $filename = bin2hex(random_bytes(16)) . '.' . $ext;
-    $targetPath = UPLOAD_PATH . $subDir . $filename;
+    
+    $targetDir = UPLOAD_PATH . $subDir;
+    if (!is_dir($targetDir)) {
+        if (!mkdir($targetDir, 0755, true)) {
+            error_log("Upload rejected: Failed to create target directory '{$targetDir}'. Check permissions.");
+            return false;
+        }
+    }
+    
+    $targetPath = $targetDir . $filename;
     
     if (move_uploaded_file($file['tmp_name'], $targetPath)) {
         return $subDir . $filename;
     }
     
+    error_log("Upload rejected: Failed to move file to '{$targetPath}'.");
     return false;
 }
 
-function deleteFile(string $filename, string $type): bool {
+function deleteFile(?string $filename, string $type): bool {
+    if (empty($filename)) {
+        return false;
+    }
     // filename already includes subdir from uploadFile
     $filePath = UPLOAD_PATH . $filename;
     if (file_exists($filePath)) {
@@ -210,11 +277,9 @@ function deleteFile(string $filename, string $type): bool {
 }
 
 function sendEmail(string $to, string $toName, string $subject, string $htmlBody): bool {
-    // This requires PHPMailer via composer, which we'll set up.
-    // For now, providing the placeholder structure.
-    /*
     $mail = new PHPMailer\PHPMailer\PHPMailer(true);
     try {
+        // Server settings
         $mail->isSMTP();
         $mail->Host       = MAIL_HOST;
         $mail->SMTPAuth   = true;
@@ -223,17 +288,21 @@ function sendEmail(string $to, string $toName, string $subject, string $htmlBody
         $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = MAIL_PORT;
 
+        // Recipients
         $mail->setFrom(MAIL_FROM, MAIL_FROM_NAME);
         $mail->addAddress($to, $toName);
+
+        // Content
         $mail->isHTML(true);
         $mail->Subject = $subject;
         $mail->Body    = $htmlBody;
+        $mail->AltBody = strip_tags($htmlBody);
+
         return $mail->send();
     } catch (Exception $e) {
+        error_log("Mail Error: {$mail->ErrorInfo}");
         return false;
     }
-    */
-    return true; // Placeholder
 }
 
 function formatDate(string $date): string {

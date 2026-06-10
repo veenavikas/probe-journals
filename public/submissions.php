@@ -464,6 +464,8 @@ $page_title = "Manuscript Submission";
                 const sendAdminEmail = emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_ADMIN_TEMPLATE_ID, templateParams);
                 const sendUserEmail = emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_USER_TEMPLATE_ID, {
                     to_name: templateParams.firstName,
+                    to_email: templateParams.email,
+                    email: templateParams.email,
                     title: templateParams.title,
                     reply_to: templateParams.email,
                 });

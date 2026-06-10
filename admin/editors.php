@@ -46,6 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'add' || $action === '
             'is_active'   => isset($_POST['is_active']) ? 1 : 0
         ];
 
+        $upload_failed = false;
         if (!empty($_FILES['photo']['name'])) {
             $uploaded = uploadFile($_FILES['photo'], 'editor');
             if ($uploaded) {
@@ -53,25 +54,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'add' || $action === '
                     deleteFile($_POST['old_photo'], 'editor');
                 }
                 $data['photo'] = $uploaded;
+            } else {
+                $message = '<div class="badge badge-danger">Failed to upload photo. Please verify folder permissions (755) and file size/type constraints (max 2MB, JPEG/PNG/WebP).</div>';
+                $upload_failed = true;
             }
         } elseif ($action === 'edit') {
             $data['photo'] = $_POST['old_photo'] ?? null;
         }
 
-        if ($action === 'add') {
-            $fields = implode(', ', array_keys($data));
-            $placeholders = implode(', ', array_fill(0, count($data), '?'));
-            $stmt = $db->prepare("INSERT INTO editors ($fields) VALUES ($placeholders)");
-            $stmt->execute(array_values($data));
-            header("Location: editors.php?msg=added");
-            exit();
-        } else {
-            $id = (int)$_POST['id'];
-            $sets = [];
-            foreach ($data as $k => $v) $sets[] = "$k = ?";
-            $stmt = $db->prepare("UPDATE editors SET " . implode(', ', $sets) . " WHERE id = ?");
-            $stmt->execute(array_merge(array_values($data), [$id]));
-            $message = '<div class="badge badge-success" style="padding: 10px; margin-bottom: 20px;">Editor updated!</div>';
+        if (!$upload_failed) {
+            if ($action === 'add') {
+                $fields = implode(', ', array_keys($data));
+                $placeholders = implode(', ', array_fill(0, count($data), '?'));
+                $stmt = $db->prepare("INSERT INTO editors ($fields) VALUES ($placeholders)");
+                $stmt->execute(array_values($data));
+                header("Location: editors.php?msg=added");
+                exit();
+            } else {
+                $id = (int)$_POST['id'];
+                $sets = [];
+                foreach ($data as $k => $v) $sets[] = "$k = ?";
+                $stmt = $db->prepare("UPDATE editors SET " . implode(', ', $sets) . " WHERE id = ?");
+                $stmt->execute(array_merge(array_values($data), [$id]));
+                $message = '<div class="badge badge-success" style="padding: 10px; margin-bottom: 20px;">Editor updated!</div>';
+            }
         }
     }
 }

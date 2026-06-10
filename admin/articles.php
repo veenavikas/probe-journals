@@ -5,6 +5,15 @@ $title = "Manage Articles";
 $activeNav = "articles";
 $db = getDB();
 
+// --- Automatic DB Migration for new columns ---
+try {
+    $db->exec("ALTER TABLE articles ADD COLUMN article_type VARCHAR(100) AFTER authors");
+} catch (PDOException $e) {}
+try {
+    $db->exec("ALTER TABLE articles ADD COLUMN in_press TINYINT(1) DEFAULT 0 AFTER is_published");
+} catch (PDOException $e) {}
+// ----------------------------------------------
+
 $action = $_GET['action'] ?? 'list';
 $article_id = $_GET['id'] ?? null;
 $message = '';
@@ -47,9 +56,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'add' || $action === '
             'received_date' => $_POST['received_date'],
             'accepted_date' => $_POST['accepted_date'],
             'published_date'=> $_POST['published_date'],
-            'is_published'  => isset($_POST['is_published']) ? 1 : 0
+            'views_count'   => isset($_POST['views_count']) ? (int)$_POST['views_count'] : 0,
+            'downloads_count'=> isset($_POST['downloads_count']) ? (int)$_POST['downloads_count'] : 0,
+            'is_published'  => isset($_POST['is_published']) ? 1 : 0,
+            'in_press'      => isset($_POST['in_press']) ? 1 : 0
         ];
 
+        $upload_failed = false;
         // Handle File Upload
         if (!empty($_FILES['pdf_file']['name'])) {
             $uploaded = uploadFile($_FILES['pdf_file'], 'pdf');
@@ -59,28 +72,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'add' || $action === '
                     deleteFile($_POST['old_pdf'], 'pdf');
                 }
                 $data['pdf_file'] = $uploaded;
+            } else {
+                $message = '<div class="badge badge-danger">Failed to upload PDF file. Please verify folder permissions (755) and file constraints (max 10MB, PDF only).</div>';
+                $upload_failed = true;
             }
         } elseif ($action === 'edit') {
             $data['pdf_file'] = $_POST['old_pdf'];
         }
 
-        if ($action === 'add') {
-            $fields = implode(', ', array_keys($data));
-            $placeholders = implode(', ', array_fill(0, count($data), '?'));
-            $sql = "INSERT INTO articles ($fields) VALUES ($placeholders)";
-            $stmt = $db->prepare($sql);
-            if ($stmt->execute(array_values($data))) {
-                header("Location: articles.php?msg=added");
-                exit();
-            }
-        } else {
-            $id = (int)$_POST['id'];
-            $sets = [];
-            foreach ($data as $key => $val) $sets[] = "$key = ?";
-            $sql = "UPDATE articles SET " . implode(', ', $sets) . " WHERE id = ?";
-            $stmt = $db->prepare($sql);
-            if ($stmt->execute(array_merge(array_values($data), [$id]))) {
-                $message = '<div class="badge badge-success" style="padding: 10px; margin-bottom: 20px;">Article updated successfully!</div>';
+        if (!$upload_failed) {
+            if ($action === 'add') {
+                $fields = implode(', ', array_keys($data));
+                $placeholders = implode(', ', array_fill(0, count($data), '?'));
+                $sql = "INSERT INTO articles ($fields) VALUES ($placeholders)";
+                $stmt = $db->prepare($sql);
+                if ($stmt->execute(array_values($data))) {
+                    header("Location: articles.php?msg=added");
+                    exit();
+                }
+            } else {
+                $id = (int)$_POST['id'];
+                $sets = [];
+                foreach ($data as $key => $val) $sets[] = "$key = ?";
+                $sql = "UPDATE articles SET " . implode(', ', $sets) . " WHERE id = ?";
+                $stmt = $db->prepare($sql);
+                if ($stmt->execute(array_merge(array_values($data), [$id]))) {
+                    $message = '<div class="badge badge-success" style="padding: 10px; margin-bottom: 20px;">Article updated successfully!</div>';
+                }
             }
         }
     }
@@ -92,6 +110,26 @@ if ($action === 'add' || ($action === 'edit' && $article_id)):
     $article = ($action === 'edit') ? $db->prepare("SELECT * FROM articles WHERE id = ?") : null;
     if ($article) { $article->execute([$article_id]); $article = $article->fetch(); }
     $journals = getAllJournals();
+
+    // Fetch existing unique article types to populate the suggestions datalist, merged with defaults
+    $typeStmt = $db->query("SELECT DISTINCT article_type FROM articles WHERE article_type IS NOT NULL AND article_type != '' ORDER BY article_type ASC");
+    $existingTypes = $typeStmt->fetchAll(PDO::FETCH_COLUMN);
+    $standardTypes = [
+        'Research Article', 
+        'Review Article', 
+        'Case Report', 
+        'Mini Review', 
+        'Brief Commentary', 
+        'Commentary', 
+        'Image Article', 
+        'Case Study', 
+        'Prospective', 
+        'Editorial', 
+        'Book Review', 
+        'Thesis'
+    ];
+    $allTypes = array_unique(array_merge($existingTypes, $standardTypes));
+    sort($allTypes);
 ?>
     <div style="margin-bottom: 20px;">
         <a href="articles.php" style="text-decoration: none; color: #64748b;">&larr; Back to List</a>
@@ -141,11 +179,12 @@ if ($action === 'add' || ($action === 'edit' && $article_id)):
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group">
                     <label>Article Type</label>
-                    <select name="article_type">
-                        <option value="Research Article" <?php echo ($article && $article['article_type'] == 'Research Article') ? 'selected' : ''; ?>>Research Article</option>
-                        <option value="Review Article" <?php echo ($article && $article['article_type'] == 'Review Article') ? 'selected' : ''; ?>>Review Article</option>
-                        <option value="Case Report" <?php echo ($article && $article['article_type'] == 'Case Report') ? 'selected' : ''; ?>>Case Report</option>
-                    </select>
+                    <input type="text" name="article_type" value="<?php echo sanitize($article['article_type'] ?? 'Research Article'); ?>" list="article_types" required>
+                    <datalist id="article_types">
+                        <?php foreach ($allTypes as $type): ?>
+                            <option value="<?php echo sanitize($type); ?>">
+                        <?php endforeach; ?>
+                    </datalist>
                 </div>
                 <div class="form-group">
                     <label>DOI</label>
@@ -173,6 +212,17 @@ if ($action === 'add' || ($action === 'edit' && $article_id)):
                 </div>
             </div>
 
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label>Views Count</label>
+                    <input type="number" name="views_count" value="<?php echo $article['views_count'] ?? 0; ?>" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Downloads Count</label>
+                    <input type="number" name="downloads_count" value="<?php echo $article['downloads_count'] ?? 0; ?>" min="0">
+                </div>
+            </div>
+
             <div class="form-group">
                 <label>Upload PDF (Max 10MB)</label>
                 <input type="file" name="pdf_file" accept=".pdf">
@@ -185,6 +235,13 @@ if ($action === 'add' || ($action === 'edit' && $article_id)):
                 <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
                     <input type="checkbox" name="is_published" <?php echo (!$article || $article['is_published']) ? 'checked' : ''; ?>>
                     Published (Visible in Archive)
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" name="in_press" <?php echo ($article && $article['in_press']) ? 'checked' : ''; ?>>
+                    Articles in Press (Accepted but not yet assigned to dynamic volume/issue)
                 </label>
             </div>
 
@@ -228,6 +285,9 @@ if ($action === 'add' || ($action === 'edit' && $article_id)):
                         <span class="badge <?php echo $a['is_published'] ? 'badge-success' : 'badge-warning'; ?>">
                             <?php echo $a['is_published'] ? 'Published' : 'Draft'; ?>
                         </span>
+                        <?php if ($a['in_press']): ?>
+                            <span class="badge" style="background: #ec4899; color: white; margin-top: 4px; display: inline-block;">In Press</span>
+                        <?php endif; ?>
                     </td>
                     <td>
                         <div style="display: flex; gap: 5px;">
