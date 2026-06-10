@@ -15,6 +15,15 @@ try {
 try {
     $db->exec("ALTER TABLE journals ADD COLUMN publication_ethics TEXT AFTER submission_content");
 } catch (PDOException $e) {}
+try {
+    $db->exec("ALTER TABLE journals ADD COLUMN acceptance_rate DECIMAL(5,2) DEFAULT 28.41");
+} catch (PDOException $e) {}
+try {
+    $db->exec("ALTER TABLE journals ADD COLUMN rejection_rate DECIMAL(5,2) DEFAULT 40.89");
+} catch (PDOException $e) {}
+try {
+    $db->exec("ALTER TABLE journals ADD COLUMN submitted_rate DECIMAL(5,2) DEFAULT 30.70");
+} catch (PDOException $e) {}
 // ----------------------------------------------
 
 $action = $_GET['action'] ?? 'list';
@@ -42,6 +51,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'add' || $action === '
         $cite_score = !empty($_POST['cite_score']) ? (float)$_POST['cite_score'] : null;
         $impact_factor = !empty($_POST['impact_factor']) ? (float)$_POST['impact_factor'] : null;
         $h_index = !empty($_POST['h_index']) ? (int)$_POST['h_index'] : null;
+        $acceptance_rate = !empty($_POST['acceptance_rate']) ? (float)$_POST['acceptance_rate'] : 28.41;
+        $rejection_rate = !empty($_POST['rejection_rate']) ? (float)$_POST['rejection_rate'] : 40.89;
+        $submitted_rate = !empty($_POST['submitted_rate']) ? (float)$_POST['submitted_rate'] : 30.70;
         
         $acceptance_time = sanitize($_POST['acceptance_time'] ?? '');
         $processing_time = sanitize($_POST['processing_time'] ?? '');
@@ -85,8 +97,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'add' || $action === '
                             cite_score, impact_factor, h_index, acceptance_time, processing_time, 
                             publishing_time, issue_frequency, apc_amount, apc_currency, 
                             withdrawal_fee, withdrawal_days, submission_email, privacy_statement, 
-                            copyright_text, contact_info, cover_image, sort_order, is_active
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                            copyright_text, contact_info, cover_image, sort_order, is_active,
+                            acceptance_rate, rejection_rate, submitted_rate
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $stmt = $db->prepare($sql);
                 try {
                     if ($stmt->execute([
@@ -95,7 +108,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'add' || $action === '
                         $cite_score, $impact_factor, $h_index, $acceptance_time, $processing_time,
                         $publishing_time, $issue_frequency, $apc_amount, $apc_currency,
                         $withdrawal_fee, $withdrawal_days, $submission_email, $privacy_statement,
-                        $copyright_text, $contact_info, $cover_image, $sort_order, $is_active
+                        $copyright_text, $contact_info, $cover_image, $sort_order, $is_active,
+                        $acceptance_rate, $rejection_rate, $submitted_rate
                     ])) {
                         header("Location: journals.php?msg=added");
                         exit();
@@ -107,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'add' || $action === '
                 }
             } else {
                 $id = (int)$_POST['id'];
-                $sql = "UPDATE journals SET 
+                 $sql = "UPDATE journals SET 
                         name = ?, slug = ?, short_name = ?, subject_category = ?, 
                         description = ?, aim_and_scope = ?, author_guidelines = ?, 
                         submission_content = ?, publication_ethics = ?, cite_score = ?, 
@@ -116,7 +130,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'add' || $action === '
                         apc_amount = ?, apc_currency = ?, withdrawal_fee = ?, 
                         withdrawal_days = ?, submission_email = ?, privacy_statement = ?, 
                         copyright_text = ?, contact_info = ?, cover_image = ?, 
-                        sort_order = ?, is_active = ?
+                        sort_order = ?, is_active = ?,
+                        acceptance_rate = ?, rejection_rate = ?, submitted_rate = ?
                         WHERE id = ?";
                 $stmt = $db->prepare($sql);
                 if ($stmt->execute([
@@ -126,6 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'add' || $action === '
                     $publishing_time, $issue_frequency, $apc_amount, $apc_currency,
                     $withdrawal_fee, $withdrawal_days, $submission_email, $privacy_statement,
                     $copyright_text, $contact_info, $cover_image, $sort_order, $is_active,
+                    $acceptance_rate, $rejection_rate, $submitted_rate,
                     $id
                 ])) {
                     $message = '<div class="badge badge-success" style="padding: 10px; margin-bottom: 20px;">Journal updated successfully!</div>';
@@ -212,6 +228,22 @@ if (($action === 'add' || $action === 'edit') && ($action === 'add' || $journal_
                 <div class="form-group">
                     <label>Sort Order</label>
                     <input type="number" name="sort_order" value="<?php echo $journal ? $journal['sort_order'] : '0'; ?>">
+                </div>
+            </div>
+
+            <h3 style="font-size: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; margin-top: 30px; margin-bottom: 15px;">Article Statistics (Pie Chart Rates)</h3>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                <div class="form-group">
+                    <label>Acceptance Rate (%)</label>
+                    <input type="number" step="0.01" name="acceptance_rate" value="<?php echo $journal ? $journal['acceptance_rate'] : '28.41'; ?>" required>
+                </div>
+                <div class="form-group">
+                    <label>Rejection Rate (%)</label>
+                    <input type="number" step="0.01" name="rejection_rate" value="<?php echo $journal ? $journal['rejection_rate'] : '40.89'; ?>" required>
+                </div>
+                <div class="form-group">
+                    <label>Submitted Rate (%)</label>
+                    <input type="number" step="0.01" name="submitted_rate" value="<?php echo $journal ? $journal['submitted_rate'] : '30.70'; ?>" required>
                 </div>
             </div>
 

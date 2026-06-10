@@ -40,11 +40,54 @@ $impactFactor = htmlspecialchars($journal['impact_factor'] ?? '4.3');
 $hIndex = htmlspecialchars($journal['h_index'] ?? '8');
 $processingTime = htmlspecialchars($journal['processing_time'] ?? '10-20 days');
 $acceptanceTime = htmlspecialchars($journal['acceptance_time'] ?? '7-25 days');
-// Mock rates for the chart
-$acceptanceRate = 28.41;
-$rejectionRate = 40.89;
-$submittedRate = 30.09;
-$totalArticles = 102; 
+// Retrieve rates from journal record, falling back to defaults if not set
+$acceptanceRate = isset($journal['acceptance_rate']) ? (float)$journal['acceptance_rate'] : 28.41;
+$rejectionRate = isset($journal['rejection_rate']) ? (float)$journal['rejection_rate'] : 40.89;
+$submittedRate = isset($journal['submitted_rate']) ? (float)$journal['submitted_rate'] : 30.70;
+
+// Dynamic pie chart path calculations
+$totalRate = $rejectionRate + $acceptanceRate + $submittedRate;
+if ($totalRate <= 0) {
+    $totalRate = 100;
+}
+
+$pRejection = $rejectionRate / $totalRate;
+$pAcceptance = $acceptanceRate / $totalRate;
+$pSubmitted = $submittedRate / $totalRate;
+
+$angle1 = $pRejection * 360;
+$angle2 = $pAcceptance * 360;
+$angle3 = $pSubmitted * 360;
+
+if (!function_exists('getPieSegmentCoords')) {
+    function getPieSegmentCoords($startAngle, $sweepAngle, $cx = 130, $cy = 130, $r = 100) {
+        $endAngle = $startAngle + $sweepAngle;
+        
+        $radStart = deg2rad($startAngle);
+        $radEnd = deg2rad($endAngle);
+        
+        $x1 = $cx + $r * cos($radStart);
+        $y1 = $cy + $r * sin($radStart);
+        $x2 = $cx + $r * cos($radEnd);
+        $y2 = $cy + $r * sin($radEnd);
+        
+        $largeArcFlag = ($sweepAngle > 180) ? 1 : 0;
+        
+        $radMid = deg2rad($startAngle + $sweepAngle / 2);
+        $tx = $cx + ($r * 0.58) * cos($radMid);
+        $ty = $cy + ($r * 0.58) * sin($radMid) + 7;
+        
+        return [
+            'path' => sprintf("M %d,%d L %.3f,%.3f A %d,%d 0 %d,1 %.3f,%.3f Z", $cx, $cy, $x1, $y1, $r, $r, $largeArcFlag, $x2, $y2),
+            'tx' => $tx,
+            'ty' => $ty
+        ];
+    }
+}
+
+$seg1 = getPieSegmentCoords(-90, $angle1);
+$seg2 = getPieSegmentCoords(-90 + $angle1, $angle2);
+$seg3 = getPieSegmentCoords(-90 + $angle1 + $angle2, $angle3);
 ?>
 
 <style>
@@ -823,20 +866,38 @@ $totalArticles = 102;
                <div class="jb-widget">
                    <h3 class="jb-widget-title" style="text-align: center;">Article Statistics</h3>
                    <div class="jb-pie-container">
-                       <svg viewBox="0 0 260 260">
-                           <path d="M 130,130 L 130.000,30.000 A 100,100 0 0,1 184.165,214.060 Z" fill="#ef4444" />
-                           <path d="M 130,130 L 184.165,214.060 A 100,100 0 0,1 36.345,165.053 Z" fill="#10b981" />
-                           <path d="M 130,130 L 36.345,165.053 A 100,100 0 0,1 126.168,30.073 Z" fill="#3b82f6" />
-                           <g stroke="white" stroke-width="2">
-                               <path d="M 130,130 L 130.000,30.000 A 100,100 0 0,1 184.165,214.060 Z" fill="none" />
-                               <path d="M 130,130 L 184.165,214.060 A 100,100 0 0,1 36.345,165.053 Z" fill="none" />
-                               <path d="M 130,130 L 36.345,165.053 A 100,100 0 0,1 126.168,30.073 Z" fill="none" />
-                           </g>
-                           <text x="187.56" y="113.06" text-anchor="middle" fill="#fff" font-size="20"><?php echo $rejectionRate; ?>%</text>
-                           <text x="111.12" y="186.95" text-anchor="middle" fill="#fff" font-size="20"><?php echo $acceptanceRate; ?>%</text>
-                           <text x="80.05" y="96.76" text-anchor="middle" fill="#fff" font-size="20"><?php echo $submittedRate; ?>%</text>
-                           <circle cx="130" cy="130" r="30" fill="white" />
-                       </svg>
+                        <svg viewBox="0 0 260 260">
+                            <?php if ($angle1 > 0): ?>
+                            <path d="<?php echo $seg1['path']; ?>" fill="#ef4444" />
+                            <?php endif; ?>
+                            <?php if ($angle2 > 0): ?>
+                            <path d="<?php echo $seg2['path']; ?>" fill="#10b981" />
+                            <?php endif; ?>
+                            <?php if ($angle3 > 0): ?>
+                            <path d="<?php echo $seg3['path']; ?>" fill="#3b82f6" />
+                            <?php endif; ?>
+                            <g stroke="white" stroke-width="2">
+                                <?php if ($angle1 > 0): ?>
+                                <path d="<?php echo $seg1['path']; ?>" fill="none" />
+                                <?php endif; ?>
+                                <?php if ($angle2 > 0): ?>
+                                <path d="<?php echo $seg2['path']; ?>" fill="none" />
+                                <?php endif; ?>
+                                <?php if ($angle3 > 0): ?>
+                                <path d="<?php echo $seg3['path']; ?>" fill="none" />
+                                <?php endif; ?>
+                            </g>
+                            <?php if ($rejectionRate > 3): ?>
+                            <text x="<?php echo $seg1['tx']; ?>" y="<?php echo $seg1['ty']; ?>" text-anchor="middle" fill="#fff" font-size="20"><?php echo number_format($rejectionRate, 1); ?>%</text>
+                            <?php endif; ?>
+                            <?php if ($acceptanceRate > 3): ?>
+                            <text x="<?php echo $seg2['tx']; ?>" y="<?php echo $seg2['ty']; ?>" text-anchor="middle" fill="#fff" font-size="20"><?php echo number_format($acceptanceRate, 1); ?>%</text>
+                            <?php endif; ?>
+                            <?php if ($submittedRate > 3): ?>
+                            <text x="<?php echo $seg3['tx']; ?>" y="<?php echo $seg3['ty']; ?>" text-anchor="middle" fill="#fff" font-size="20"><?php echo number_format($submittedRate, 1); ?>%</text>
+                            <?php endif; ?>
+                            <circle cx="130" cy="130" r="30" fill="white" />
+                        </svg>
                    </div>
                    <div class="jb-pie-legend">
                        <div class="jb-pie-legend-item">
