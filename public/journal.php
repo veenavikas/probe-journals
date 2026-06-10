@@ -786,17 +786,21 @@ $totalArticles = 102;
                            </div>
                            <button type="submit" style="background: #3b82f6; color: white; padding: 12px 24px; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; width: 100%; transition: background 0.2s;">Send Message</button>
                        </form>
-                   </div>
-               </div>
+                    </div>
+                </div>
 
-           </div>
+            </div>
 
            <!-- Right Column (Sidebar Widgets) -->
            <div class="jb-sidebar">
                
                <div class="jb-widget" style="background: white; text-align: center; padding: 15px;">
-                   <a href="#" style="font-weight: 600; color: #1d4ed8; text-decoration: underline; margin-bottom: 5px; display: block;">Open Access Journals</a>
-                   <a href="#" style="font-weight: 600; color: #1d4ed8; text-decoration: underline; display: block;">List Of All Journals</a>
+                   <a href="#" style="font-weight: 600; color: #1d4ed8; text-decoration: underline; margin-bottom: 5px; display: block;">
+                       <?php echo getSiteSetting('oa_articles_total', '102'); ?> Open Access Articles
+                   </a>
+                   <a href="<?php echo SITE_URL; ?>/list-of-journals.php" style="font-weight: 600; color: #1d4ed8; text-decoration: underline; display: block;">
+                       <?php echo getSiteSetting('oa_journals_total', '7'); ?> Open Access Journals
+                   </a>
                </div>
 
                <div class="jb-widget">

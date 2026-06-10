@@ -68,7 +68,7 @@ $testimonials    = getTestimonialsByJournal();
 
                 <div class="hp-mission-stats">
                     <div class="hp-stat">
-                        <span class="hp-stat__num"><?php echo getSiteSetting('oa_journals_total', '9'); ?>+</span>
+                        <span class="hp-stat__num"><?php echo getSiteSetting('oa_journals_total', '7'); ?>+</span>
                         <span class="hp-stat__label">Active Journals</span>
                     </div>
                     <div class="hp-stat">

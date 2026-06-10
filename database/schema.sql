@@ -197,7 +197,7 @@ INSERT IGNORE INTO site_settings (setting_key, setting_value, setting_label, set
 ('address_registered', '91 Ivy Lane, Waltham Cross, United Kingdom, EN8', 'Registered Address', 'textarea'),
 ('address_main', 'Probe Publisher, 45 Highfield Road, London, UK', 'Main Address', 'textarea'),
 ('oa_articles_total', '102', 'Total OA Articles', 'number'),
-('oa_journals_total', '9', 'Total OA Journals', 'number');
+('oa_journals_total', '7', 'Total OA Journals', 'number');
 
 -- Seed all 9 journals
 INSERT IGNORE INTO journals (name, slug, short_name, subject_category, cite_score, impact_factor, h_index, acceptance_time, processing_time, publishing_time, issue_frequency, apc_amount, withdrawal_fee, submission_email, is_active, sort_order) VALUES

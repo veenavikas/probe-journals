@@ -289,7 +289,7 @@ CREATE TABLE `site_settings` (
 
 LOCK TABLES `site_settings` WRITE;
 /*!40000 ALTER TABLE `site_settings` DISABLE KEYS */;
-INSERT INTO `site_settings` VALUES ('address_main','Probe Publisher, 45 Highfield Road, London, UK','Main Address','textarea'),('address_registered','91 Ivy Lane, Waltham Cross, United Kingdom, EN8','Registered Address','textarea'),('contact_email','contact@probejournals.com','Contact Email','email'),('oa_articles_total','102','Total OA Articles','number'),('oa_journals_total','9','Total OA Journals','number'),('phone','+44 3455007136','Phone Number','text'),('publish_email','publish@probejournals.com','Submissions Email','email'),('site_name','Probe Journals','Site Name','text'),('site_tagline','Global Open Access Scientific and Academic Journals','Tagline','text');
+INSERT INTO `site_settings` VALUES ('address_main','Probe Publisher, 45 Highfield Road, London, UK','Main Address','textarea'),('address_registered','91 Ivy Lane, Waltham Cross, United Kingdom, EN8','Registered Address','textarea'),('contact_email','contact@probejournals.com','Contact Email','email'),('oa_articles_total','102','Total OA Articles','number'),('oa_journals_total','7','Total OA Journals','number'),('phone','+44 3455007136','Phone Number','text'),('publish_email','publish@probejournals.com','Submissions Email','email'),('site_name','Probe Journals','Site Name','text'),('site_tagline','Global Open Access Scientific and Academic Journals','Tagline','text');
 /*!40000 ALTER TABLE `site_settings` ENABLE KEYS */;
 UNLOCK TABLES;
 
