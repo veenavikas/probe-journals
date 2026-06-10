@@ -837,14 +837,45 @@ $seg3 = getPieSegmentCoords(-90 + $angle1 + $angle2, $angle3);
            <!-- Right Column (Sidebar Widgets) -->
            <div class="jb-sidebar">
                
-               <div class="jb-widget" style="background: white; text-align: center; padding: 15px;">
-                   <a href="#" style="font-weight: 600; color: #1d4ed8; text-decoration: underline; margin-bottom: 5px; display: block;">
-                       <?php echo getSiteSetting('oa_articles_total', '102'); ?> Open Access Articles
-                   </a>
-                   <a href="<?php echo SITE_URL; ?>/list-of-journals.php" style="font-weight: 600; color: #1d4ed8; text-decoration: underline; display: block;">
-                       <?php echo getSiteSetting('oa_journals_total', '7'); ?> Open Access Journals
-                   </a>
-               </div>
+                <div class="jb-widget" style="padding: 20px;">
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        
+                        <!-- Articles Stat Card -->
+                        <a href="#" style="display: flex; align-items: center; gap: 16px; text-decoration: none; padding: 14px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; transition: all 0.25s ease;" 
+                           onmouseover="this.style.background='#f1f5f9'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(0,0,0,0.04)'; this.style.borderColor='#cbd5e1';" 
+                           onmouseout="this.style.background='#f8fafc'; this.style.transform='translateY(0)'; this.style.boxShadow='none'; this.style.borderColor='#e2e8f0';">
+                            <div style="width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; background: rgba(37, 99, 235, 0.08); color: #2563eb; border-radius: 50%; font-size: 1.15rem; flex-shrink: 0;">
+                                <i class="fas fa-file-invoice"></i>
+                            </div>
+                            <div style="display: flex; flex-direction: column; line-height: 1.3;">
+                                <span style="font-size: 1.35rem; font-weight: 800; color: #0f172a;">
+                                    <?php echo getSiteSetting('oa_articles_total', '102'); ?>
+                                </span>
+                                <span style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;">
+                                    Open Access Articles
+                                </span>
+                            </div>
+                        </a>
+
+                        <!-- Journals Stat Card -->
+                        <a href="<?php echo SITE_URL; ?>/list-of-journals.php" style="display: flex; align-items: center; gap: 16px; text-decoration: none; padding: 14px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; transition: all 0.25s ease;" 
+                           onmouseover="this.style.background='#f1f5f9'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(0,0,0,0.04)'; this.style.borderColor='#cbd5e1';" 
+                           onmouseout="this.style.background='#f8fafc'; this.style.transform='translateY(0)'; this.style.boxShadow='none'; this.style.borderColor='#e2e8f0';">
+                            <div style="width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; background: rgba(16, 185, 129, 0.08); color: #10b981; border-radius: 50%; font-size: 1.15rem; flex-shrink: 0;">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <div style="display: flex; flex-direction: column; line-height: 1.3;">
+                                <span style="font-size: 1.35rem; font-weight: 800; color: #0f172a;">
+                                    <?php echo getSiteSetting('oa_journals_total', '7'); ?>
+                                </span>
+                                <span style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;">
+                                    Open Access Journals
+                                </span>
+                            </div>
+                        </a>
+
+                    </div>
+                </div>
 
                <div class="jb-widget">
                    <h3 class="jb-widget-title" style="text-align: center;">Journals By Subject</h3>
