@@ -231,6 +231,7 @@ function uploadFile(array $file, string $type): string|false {
         'editor' => 'editors/',
         'indexing' => 'indexing/',
         'journal' => 'journals/',
+        'brand' => 'brand/',
         default => 'others/'
     };
     

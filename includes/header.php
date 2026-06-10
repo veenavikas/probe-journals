@@ -19,7 +19,11 @@ $journals_nav = getAllJournals();
     
     <!-- CSS -->
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/main.css">
-    <link rel="icon" type="image/png" href="<?php echo SITE_URL; ?>/assets/img/probe_publisher_header_v1-removebg-preview.png">
+    <?php 
+    $faviconVal = getSiteSetting('site_favicon', '/assets/img/probe_publisher_header_v1-removebg-preview.png');
+    $faviconUrl = (strpos($faviconVal, '/') === 0 || strpos($faviconVal, 'http') === 0) ? SITE_URL . $faviconVal : SITE_URL . '/assets/uploads/' . $faviconVal;
+    ?>
+    <link rel="icon" type="image/png" href="<?php echo $faviconUrl; ?>">
     <?php if (isset($extra_css)): ?>
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/<?php echo $extra_css; ?>">
     <?php endif; ?>
@@ -50,7 +54,11 @@ $journals_nav = getAllJournals();
     
     <div class="container nav-container">
         <a href="<?php echo SITE_URL; ?>" class="logo">
-            <img src="<?php echo SITE_URL; ?>/assets/img/probe_publisher_header_v1-removebg-preview.png" alt="<?php echo SITE_NAME; ?>" style="height: 120px; width: auto;">
+            <?php 
+            $logoVal = getSiteSetting('site_logo', '/assets/img/probe_publisher_header_v1-removebg-preview.png');
+            $logoUrl = (strpos($logoVal, '/') === 0 || strpos($logoVal, 'http') === 0) ? SITE_URL . $logoVal : SITE_URL . '/assets/uploads/' . $logoVal;
+            ?>
+            <img src="<?php echo $logoUrl; ?>" alt="<?php echo SITE_NAME; ?>" style="height: 120px; width: auto;">
         </a>
         
         <nav id="main-nav">

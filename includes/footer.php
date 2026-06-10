@@ -4,7 +4,11 @@
     <div class="container">
         <div class="footer-grid">
             <div class="footer-about">
-                <img src="<?php echo SITE_URL; ?>/assets/img/probe_publisher_header_v1-removebg-preview.png" alt="<?php echo SITE_NAME; ?>" style="height: 180px; width: auto; margin-bottom: 20px;">
+                <?php 
+                $logoVal = getSiteSetting('site_logo', '/assets/img/probe_publisher_header_v1-removebg-preview.png');
+                $logoUrl = (strpos($logoVal, '/') === 0 || strpos($logoVal, 'http') === 0) ? SITE_URL . $logoVal : SITE_URL . '/assets/uploads/' . $logoVal;
+                ?>
+                <img src="<?php echo $logoUrl; ?>" alt="<?php echo SITE_NAME; ?>" style="height: 180px; width: auto; margin-bottom: 20px;">
                 <p style="color: #94a3b8; font-size: 0.9rem;">
                     <?php echo getSiteSetting('site_tagline'); ?>
                 </p>
